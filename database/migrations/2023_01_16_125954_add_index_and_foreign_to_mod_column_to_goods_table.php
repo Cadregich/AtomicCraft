@@ -14,8 +14,8 @@ class AddIndexAndForeignToModColumnToGoodsTable extends Migration
     public function up()
     {
         Schema::table('goods', function (Blueprint $table) {
-            $table->index('mod', 'goods_mod_idx');
-            $table->foreign('mod', 'goods_mod_fk')
+            $table->index('mod_id', 'goods_mod_idx');
+            $table->foreign('mod_id', 'goods_mod_fk')
                 ->on('mods')->references('id')->onDelete('set null');
         });
     }

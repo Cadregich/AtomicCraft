@@ -16,7 +16,7 @@ class CreateGoodsTable extends Migration
         Schema::create('goods', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('mod')->nullable();
+            $table->unsignedBigInteger('mod_id')->nullable();
             $table->string('img');
             $table->integer('price');
             $table->text('associations');
