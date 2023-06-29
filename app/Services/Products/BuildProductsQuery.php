@@ -17,12 +17,12 @@ class BuildProductsQuery
         if (!$goodsHasQueries) {
             $goods = Product::join('mods', 'goods.mod_id', '=', 'mods.id')
                 ->select('goods.id', 'goods.name', 'mods.title as mod', 'goods.img', 'goods.price')
-                ->orderBy('mods.title', 'asc')->paginate(15)->withQueryString();
+                ->orderBy('mods.title', 'asc')->paginate(15)->onEachSide(0)->withQueryString();
         } else {
             $goods = $goodsHasQueries->join('mods','goods.mod_id', '=', 'mods.id')
                 ->orderBy('mods.title', 'asc')
                 ->select('goods.id', 'goods.name', 'mods.title as mod', 'goods.img', 'goods.price')
-                ->paginate(15)->withQueryString();
+                ->paginate(15)->onEachSide(0)->withQueryString();
         }
         return $goods;
     }
