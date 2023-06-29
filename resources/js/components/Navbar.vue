@@ -17,7 +17,7 @@
                         </router-link>
                     </li>
                     <li class="nav-item">
-                        <router-link :to="{ name: 'test' }" class="nav-link active" aria-current="page">
+                        <router-link :to="{ name: 'shop' }" class="nav-link active" aria-current="page">
                             Магазин
                         </router-link>
                     </li>
@@ -84,6 +84,7 @@
             <!-- /.Right menu -->
         </div>
     </nav>
+    <div style="margin-bottom: 70px"></div>
 </template>
 
 <script>
@@ -156,7 +157,7 @@ export default {
             dropdown.hide();
             elementMenu.style.display = "none";
         });
-    },
+    }
 };
 </script>
 
@@ -164,6 +165,7 @@ export default {
 * {
     color: white !important;
 }
+
 .navbar {
     border-bottom: solid 2px hotpink;
     background: url('/images/backgrounds/header_backgroun9d.png');
