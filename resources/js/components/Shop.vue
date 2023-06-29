@@ -51,8 +51,7 @@
                         {{ Product.mod }}
                     </div>
                     <div class="card-button-area">
-                        <button class="butt card-btn" :item-name="Product.name"
-                                :item-id="Product.id" :item-cost="Product.price">
+                        <button class="butt card-btn" :item-name="Product.name" :item-id="Product.id" :item-cost="Product.price">
                             {{ Product.price }}
                             <i class="fa-solid fa-coins" id="card-coins"></i>
                         </button>
@@ -103,8 +102,11 @@ export default {
                 });
         },
         submitFilter() {
-            this.$store.commit('setProductsFilters', this.filters);
-            this.$store.dispatch('getPaginatorData', {path: 'shop/paginator', page: 1});
+            console.log('меня вызвали');
+            this.$store.dispatch('getPaginatorDataWithFilters', {path: 'shop/paginator', filters: this.filters});
+            if (this.filters.search === '') {
+                this.filters.mod = '';
+            }
         }
     }
 }

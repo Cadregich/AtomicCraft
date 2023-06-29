@@ -16,8 +16,9 @@ const store = new Vuex.Store({
             state.cache.paginatorData += paginatorData;
         },
 
-        setPaginatorResult(state, data) {
-            state.products = data;
+        resetCache(state) {
+            state.cache.products = {};
+            state.cache.paginatorData = {};
         },
 
         updatePaginator(state, response) {
@@ -35,13 +36,11 @@ const store = new Vuex.Store({
     actions: {
         getPaginatorData({commit, state}, payload) {
             const {path, page} = payload;
-            if (!state.productsFilters.length > 0 || state.productsFilters.search === '' && state.productsFilters.mod === '') {
-                if (state.cache.paginatorData[page] && state.cache.products[page]) {
-                    commit('updatePaginator', state.cache.paginatorData[page]);
-                    commit('setProducts', state.cache.products[page].products);
-                    console.log('данные получены из кеша');
-                    return;
-                }
+            if (state.cache.paginatorData[page] && state.cache.products[page]) {
+                commit('updatePaginator', state.cache.paginatorData[page]);
+                commit('setProducts', state.cache.products[page].products);
+                console.log('данные получены из кеша');
+                return;
             }
             axios.get('/api/' + path, {params: {page: page, ...state.productsFilters}})
                 .then(response => {
@@ -52,22 +51,33 @@ const store = new Vuex.Store({
                     paginatorData.links.pop();
                     commit('updatePaginator', paginatorData);
                     commit('setProducts', data);
-
-                    if (!state.productsFilters.length > 0  || state.productsFilters.search === '' && state.productsFilters.mod === '') {
-                        state.cache.paginatorData[page] = {
-                            current_page: paginatorData.current_page,
-                            last_page: paginatorData.last_page,
-                            links: paginatorData.links
-                        }
-                        state.cache.products[page] = {
-                            products: data
-                        }
+                    state.cache.paginatorData[page] = {
+                        current_page: paginatorData.current_page,
+                        last_page: paginatorData.last_page,
+                        links: paginatorData.links
                     }
+                    state.cache.products[page] = {
+                        products: data
+                    }
+
                 })
                 .catch((error) => {
                     console.error(error);
                 });
         },
+        getPaginatorDataWithFilters({commit, state}, payload) {
+            const {path, filters} = payload;
+            commit('resetCache');
+            if (filters.search !== '' || filters.mod !== '') {
+                if (filters !== state.productsFilters) {
+                    console.log('фильтры другие');
+                }
+                commit('setProductsFilters', filters);
+            } else {
+                commit('setProductsFilters', []);
+            }
+            this.dispatch('getPaginatorData', {path: path, page: 1});
+        }
     },
     getters: {
         getPaginatorResult: (state) => {
