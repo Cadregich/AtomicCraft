@@ -17,7 +17,7 @@ class BuildProductsQuery
         if (!$goodsHasQueries) {
             $goods = Product::join('mods', 'goods.mod_id', '=', 'mods.id')
                 ->select('goods.id', 'goods.name', 'mods.title as mod', 'goods.img', 'goods.price')
-                ->orderBy('mods.title', 'asc')->paginate(15)->onEachSide(0)->withQueryString();
+                ->orderBy('mods.title', 'asc')->orderBy('name', 'asc')->paginate(15)->onEachSide(0)->withQueryString();
         } else {
             $goods = $goodsHasQueries->join('mods','goods.mod_id', '=', 'mods.id')
                 ->orderBy('mods.title', 'asc')

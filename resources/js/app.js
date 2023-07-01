@@ -3,12 +3,13 @@ import { createApp } from 'vue';
 import store from './vuex';
 import router from './router';
 import Index from './components/Index.vue';
+import './axios';
 
 const app = createApp({
     el: '#app',
 
     components: {
-        Index,
+        Index
     }
 });
 
