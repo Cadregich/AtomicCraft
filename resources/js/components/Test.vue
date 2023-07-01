@@ -4,7 +4,16 @@
 
 <script>
 export default {
-    name: "Test"
+    name: "Test",
+    mounted() {
+        axios.get('api/test')
+            .then(res => {
+                console.log(res.data);
+            })
+            .catch(error => {
+                console.log(error);
+            })
+    }
 }
 </script>
 

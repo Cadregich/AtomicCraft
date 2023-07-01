@@ -27,32 +27,90 @@
 <script>
 export default {
     name: "Paginator",
-    props: ['path'],
+    props: ['path', 'filters'],
     created() {
-        this.$store.dispatch('getPaginatorData', {path: this.path, page: 1});
+        for (const prop in this.$router.currentRoute.value.query) {
+            if (this.filters.includes(prop)) {
+                this.productsFilters[prop] = this.$router.currentRoute.value.query[prop];
+            }
+        }
+        console.log(this.productsFilters);
+        this.getPaginatorData({path: this.path, page: this.$route.query.page});
+    },
+    data() {
+        return {
+            paginatorData: [],
+            cache: {
+                paginatorData: {},
+                products: {}
+            },
+            links: {},
+            currentPage: '',
+            lastPage: ''
+        }
     },
     computed: {
-        links() {
-            return this.$store.getters.getPaginatorData.links;
-        },
-        currentPage() {
-            return this.$store.getters.getPaginatorData.current_page;
-        },
-        lastPage() {
-            return this.$store.getters.getPaginatorData.last_page;
+        productsFilters() {
+            return this.$store.getters.getProductsFilters;
+        }
+    },
+    watch: {
+        productsFilters: function() {
+            this.cache = {
+                paginatorData: {},
+                products: {}
+            }
+            this.getPaginatorData({path: this.path, page: 1});
         }
     },
     methods: {
         changePage(page) {
             if (page >= 1 && page <= this.lastPage) {
                 setTimeout(async () => {
-                    this.$store.dispatch('getPaginatorData', {path: this.path, page: page});
-                    // this.$router.replace({ query: { page: page } });
+                    this.getPaginatorData({path: this.path, page: page});
+                    this.$router.replace({query: {...this.$route.query, page: page}});
                 }, 600);
             } else {
                 console.log(this.lastPage);
             }
         },
+        getPaginatorData(payload) {
+            const {path, page} = payload;
+            if (this.cache.paginatorData[page] && this.cache.products[page]) {
+                this.paginatorData = this.cache.paginatorData[page];
+                this.setPaginatorDataToData(this.cache.paginatorData[page]);
+                this.$store.commit('setProducts', this.cache.products[page].products);
+                console.log('данные получены из кеша');
+                return;
+            }
+            axios.get('/api/' + path, {params: {page: page, ...this.productsFilters}})
+                .then(response => {
+                    console.log(response.data);
+                    const data = response.data.data;
+                    const paginatorData = {...response.data};
+                    paginatorData.links.shift();
+                    paginatorData.links.pop();
+                    this.setPaginatorDataToData(paginatorData);
+                    this.$store.commit('setProducts', data);
+                    this.cache.paginatorData[page] = {
+                        current_page: paginatorData.current_page,
+                        last_page: paginatorData.last_page,
+                        links: paginatorData.links
+                    }
+                    this.cache.products[page] = {
+                        products: data
+                    }
+
+                })
+                .catch((error) => {
+                    console.error(error);
+                });
+        },
+        setPaginatorDataToData(paginatorData) {
+            this.links = paginatorData.links;
+            this.currentPage = paginatorData.current_page;
+            this.lastPage = paginatorData.last_page;
+        }
     },
 };
 </script>

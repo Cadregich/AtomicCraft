@@ -21,13 +21,11 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::get('shop/goods-mods', function () {
-    return Mod::all()->pluck('title');
+    return Mod::orderBy('title', 'asc')->pluck('title');
 });
 
-//Route::get('/shop/paginator', function (Request $request) {
-////    return $request->all();
-//    $goods = Product::paginate(15)->onEachSide(0);
-//    return response()->json($goods);
-//});
+Route::get('/shop/products', \App\Http\Controllers\Shop\ShopController::class);
 
-Route::get('/shop/paginator', \App\Http\Controllers\Shop\ShopController::class);
+Route::get('/test', function (Request $request) {
+    return $request->all();
+});

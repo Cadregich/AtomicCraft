@@ -22,10 +22,7 @@ class ShopController extends Controller
 
     public function __invoke(GoodsSearchRequest $request)
     {
-        $goods = ($this->buildGoodsQueryService)($request);
-        $mods = Mod::orderBy('title', 'asc')->pluck('title');
-//        return view('Shop/Shop', compact('goods', 'mods'));
-        return $goods;
+        return ($this->buildGoodsQueryService)($request);
     }
 
     public function store(CreateRequest $request)

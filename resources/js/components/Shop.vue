@@ -1,12 +1,30 @@
 <template>
-    <div id="shop-header-panel" style="margin-top: 100px">
+    <div id="low-screen-balance-block">
+        <div id="low-screen-balance-block-items">
+            <div>
+                <div id="balance-low-screen">
+                    <div id="balance-low-screen-balance">
+                        <div class="nobr" id="balance-text">Ваш баланс</div>
+                        999999
+                        <i class="fa-solid fa-coins" id="balance-coins"></i>
+                    </div>
+                    <button class="butt" id="balance-butt">Пополнить</button>
+                </div>
+                <div class="low-screen-purchases-history-butt-area">
+                    <router-link :to="{ name: 'shop.goods-history' }" class="butt purchases-history-butt">
+                        Покупки
+                    </router-link>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="shop-header-panel">
         <div id="shop-header-panel-body">
             <form method="get" id="search-and-filter-mods" @submit.prevent="submitFilter">
                 <div id="form-search">
                     <label for="search"></label>
                     <input v-model="filters.search" id="search" type="text" name="search" placeholder="Поиск предметов">
-                    <button id="sub-search" type="submit"
-                            title="Простым нажатием на лупу можно сбросить параметры поиска"></button>
+                    <button id="sub-search" type="submit"></button>
                 </div>
                 <div class="btn-group">
                     <button class="butt dropdown-toggle" id="mod-butt" type="button"
@@ -45,13 +63,14 @@
                      :src="'/storage/uploads/' + Product.img + '.png'">
                 <div class="card-body">
                     <div class="card-title">
-                        <h4> {{ Product.id }} {{ Product.name }}</h4>
+                        <h4>{{ Product.name }}</h4>
                     </div>
                     <div class="card-text">
                         {{ Product.mod }}
                     </div>
                     <div class="card-button-area">
-                        <button class="butt card-btn" :item-name="Product.name" :item-id="Product.id" :item-cost="Product.price">
+                        <button class="butt card-btn" :item-name="Product.name" :item-id="Product.id"
+                                :item-cost="Product.price">
                             {{ Product.price }}
                             <i class="fa-solid fa-coins" id="card-coins"></i>
                         </button>
@@ -61,7 +80,7 @@
         </div>
         <div style="width: 100%"></div>
         <div class="mt-3">
-            <paginator :path="'shop/paginator'"></paginator>
+            <paginator :path="'shop/products'" :filters="['search', 'mod']"></paginator>
         </div>
     </div>
 </template>
@@ -90,6 +109,17 @@ export default {
     },
     mounted() {
         this.fetchMods();
+        this.adaptiveBalanceBoard();
+        if (!this.$route.query.page) {
+            this.$router.replace({query: {...this.$route.query, page: 1}});
+        }
+        if (this.$route.query.search || this.$route.query.mod) {
+            this.filters = {search: this.$route.query.search, mod: this.$route.query.mod};
+        }
+        window.addEventListener('resize', () => {
+            this.adaptiveBalanceBoard();
+            console.log(window.innerWidth);
+        });
     },
     methods: {
         fetchMods() {
@@ -103,11 +133,22 @@ export default {
         },
         submitFilter() {
             console.log('меня вызвали');
-            this.$store.dispatch('getPaginatorDataWithFilters', {path: 'shop/paginator', filters: this.filters});
-            if (this.filters.search === '') {
-                this.filters.mod = '';
+            this.$router.replace({query: {...this.$route.query, search: this.filters.search, mod: this.filters.mod}});
+            this.$store.commit('setProductsFilters', {search: this.filters.search, mod: this.filters.mod});
+        },
+        adaptiveBalanceBoard() {
+            if (document.documentElement.clientWidth < 1150) {
+                document.getElementById('normal-screen-balance-block').style.display = 'none';
+                document.getElementById('normal-screen-purchases-history-butt').style.display = 'none';
+                document.getElementById('low-screen-balance-block-items').style.display = 'block';
+                document.getElementById('search-and-filter-mods').style.justifyContent = 'center';
+            } else {
+                document.getElementById('low-screen-balance-block-items').style.display = 'none';
+                document.getElementById('normal-screen-purchases-history-butt').style.display = 'flex';
+                document.getElementById('normal-screen-balance-block').style.display = 'flex';
+                document.getElementById('search-and-filter-mods').style.justifyContent = 'start';
             }
-        }
+        },
     }
 }
 </script>
