@@ -10,9 +10,9 @@
                     </div>
                     <button class="butt" id="balance-butt">Пополнить</button>
                 </div>
-                <div class="low-screen-purchases-history-butt-area">
+                <div class="low-screen-purchases-history-butt-area d-flex justify-content-around">
                     <router-link :to="{ name: 'shop.goods-history' }" class="butt purchases-history-butt">
-                        Покупки
+                        История
                     </router-link>
                 </div>
             </div>
@@ -23,8 +23,12 @@
             <form method="get" id="search-and-filter-mods" @submit.prevent="submitFilter">
                 <div id="form-search">
                     <label for="search"></label>
-                    <input v-model="filters.search" id="search" type="text" name="search" placeholder="Поиск предметов">
+                    <input v-model="filters.search" id="search" type="text" name="search" placeholder="Найти предметы">
                     <button id="sub-search" type="submit"></button>
+                </div>
+                <div v-if="showFiltersResetButton">
+                    <button type="button" id="remove-filters-xmark" @click="resetFilters()"><i
+                        class="fa-solid fa-xmark"></i></button>
                 </div>
                 <div class="btn-group">
                     <button class="butt dropdown-toggle" id="mod-butt" type="button"
@@ -43,7 +47,7 @@
                 <div class="purchases-history-butt-area">
                     <router-link :to="{ name: 'shop.goods-history' }" class="butt purchases-history-butt"
                                  id="normal-screen-purchases-history-butt">
-                        Покупки
+                        История
                     </router-link>
                 </div>
             </form>
@@ -63,7 +67,7 @@
                      :src="'/storage/uploads/' + Product.img + '.png'">
                 <div class="card-body">
                     <div class="card-title">
-                        <h4>{{ Product.name }}</h4>
+                        <h4>{{Product.id}} {{ Product.name }}</h4>
                     </div>
                     <div class="card-text">
                         {{ Product.mod }}
@@ -80,7 +84,7 @@
         </div>
         <div style="width: 100%"></div>
         <div class="mt-3">
-            <paginator :path="'shop/products'" :filters="['search', 'mod']"></paginator>
+            <paginator ref="paginator" :path="'shop/products'"></paginator>
         </div>
     </div>
 </template>
@@ -89,7 +93,7 @@
 import Paginator from "./Paginator.vue";
 
 export default {
-    name: "TestShop",
+    name: "Shop",
     components: {
         Paginator
     },
@@ -99,7 +103,8 @@ export default {
                 search: '',
                 mod: '',
             },
-            Mods: []
+            Mods: [],
+            showFiltersResetButton: false
         }
     },
     computed: {
@@ -108,17 +113,19 @@ export default {
         },
     },
     mounted() {
+        console.log('Shop mounted');
         this.fetchMods();
         this.adaptiveBalanceBoard();
-        if (!this.$route.query.page) {
-            this.$router.replace({query: {...this.$route.query, page: 1}});
-        }
-        if (this.$route.query.search || this.$route.query.mod) {
-            this.filters = {search: this.$route.query.search, mod: this.$route.query.mod};
+
+        const {search, mod} = this.$route.query;
+        if (search || mod) {
+            this.filters = {search, mod};
+            this.$store.commit('setProductsFilters', this.filters);
+            this.showFiltersResetButton = true;
         }
         window.addEventListener('resize', () => {
             this.adaptiveBalanceBoard();
-            console.log(window.innerWidth);
+
         });
     },
     methods: {
@@ -132,9 +139,10 @@ export default {
                 });
         },
         submitFilter() {
-            console.log('меня вызвали');
-            this.$router.replace({query: {...this.$route.query, search: this.filters.search, mod: this.filters.mod}});
-            this.$store.commit('setProductsFilters', {search: this.filters.search, mod: this.filters.mod});
+            this.$router.push({ path: '/shop', query: {page: 1, search: this.filters.search, mod: this.filters.mod}});
+            if (this.filters.search !== '' || this.filters.mod !== '') {
+                this.showFiltersResetButton = true;
+            }
         },
         adaptiveBalanceBoard() {
             if (document.documentElement.clientWidth < 1150) {
@@ -149,6 +157,20 @@ export default {
                 document.getElementById('search-and-filter-mods').style.justifyContent = 'start';
             }
         },
+        resetFilters() {
+            this.$router.push({ path: '/shop', query: {page: 1}});
+            this.filters = {
+                search: '',
+                mod: ''
+            }
+            this.showFiltersResetButton = false;
+        }
+    },
+    beforeRouteUpdate(to, from, next) {
+        let clearCache;
+        clearCache = to.query.search !== from.query.search || to.query.mod !== from.query.mod;
+        this.$refs.paginator.fetchData({ path: 'shop/products', ...to.query, clearCache: clearCache });
+        next();
     }
 }
 </script>
@@ -165,7 +187,6 @@ export default {
 }
 
 #shop-header-panel-body {
-    /*background: gray;*/
     display: flex;
     align-items: center;
     width: 100%;
@@ -181,26 +202,25 @@ export default {
     width: 80%;
 }
 
-#search {
-    border: none;
-    border-bottom: 1px solid gray;
-}
-
 #form-search {
     position: relative;
+    margin-top: auto;
+    margin-bottom: auto;
     margin-left: 5px;
     width: 250px;
+    align-items: end;
 }
 
 #search-and-filter-mods {
     width: 100%;
     display: flex;
+    align-items: center;
 }
 
 #search {
     z-index: 10;
     width: 100%;
-    min-width: 160px;
+    min-width: 125px;
     height: 42px;
     padding-left: 10px;
     border: 1px solid #7617AC;
@@ -231,6 +251,31 @@ export default {
 
 #sub-search:hover, #sub-search:active {
     font-size: 24px;
+}
+
+#remove-filters-xmark {
+    width: 40px;
+    height: 42px;
+    color: white;
+    background-color: #7617AC;
+    border: 0;
+    border-radius: 5px;
+    font-size: 22px;
+    margin-left: 3px;
+}
+
+#remove-filters-xmark:hover {
+    color: red;
+    font-size: 26px;
+    transition: 0.2s;
+}
+
+#remove-filters-xmark:active {
+    .fa-xmark {
+        transform: rotate(180deg);
+        font-size: 22px;
+        transition: 0.3s;
+    }
 }
 
 #balance {
@@ -299,10 +344,6 @@ export default {
 }
 
 @media (max-width: 480px) {
-    #mod-butt {
-        /*height: 50px !important;*/
-    }
-
     #shop-header-panel {
         width: 90% !important;
     }
@@ -318,6 +359,26 @@ export default {
     #mod-butt {
         white-space: normal;
         font-size: 13px;
+    }
+
+    #search {
+        height: 35px;
+        border: 0;
+    }
+
+    #mod-butt {
+        margin-left: 10px;
+    }
+
+    #sub-search {
+        display: none;
+    }
+
+    #remove-filters-xmark {
+        width: 35px;
+        height: 35px;
+        font-size: 20px;
+        margin-left: -5px;
     }
 
     .purchases-history-butt {
@@ -338,6 +399,14 @@ export default {
     margin-left: 10px;
     margin-top: 10px;
     border-radius: 20px !important;
+}
+
+@media (max-width: 800px) {
+    .card {
+        width: 250px;
+        height: 280px;
+        margin-left: 0;
+    }
 }
 
 .card-img-top {

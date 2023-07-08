@@ -5,18 +5,20 @@
                 <ul class="pagination">
                     <!-- Arrow to the previous page -->
                     <li class="page-item" :class="{ 'disabled': currentPage === 1 }">
-                        <a class="page-link" href="#" @click="changePage(currentPage - 1)"
-                           aria-label="@lang('pagination.previous')">&lsaquo;</a>
+                        <button class="page-link" href="#" @click="changePage(currentPage - 1)"
+                                aria-label="@lang('pagination.previous')">&lsaquo;
+                        </button>
                     </li>
                     <!-- Links buttons -->
                     <li v-for="page in links" :key="page" class="page-item"
                         :class="{ 'active': page.active, 'disabled': page.label === '...' }">
-                        <a class="page-link" href="#" @click="changePage(page.label)">{{ page.label }}</a>
+                        <button class="page-link" href="#" @click="changePage(page.label)">{{ page.label }}</button>
                     </li>
                     <!-- Arrow to next page -->
                     <li class="page-item" :class="{ 'disabled': currentPage === lastPage }">
-                        <a class="page-link" href="#" @click="changePage(currentPage + 1)"
-                           aria-label="@lang('pagination.next')">&rsaquo;</a>
+                        <button class="page-link" href="#" @click="changePage(currentPage + 1)"
+                                aria-label="@lang('pagination.next')">&rsaquo;
+                        </button>
                     </li>
                 </ul>
             </div>
@@ -27,15 +29,14 @@
 <script>
 export default {
     name: "Paginator",
-    props: ['path', 'filters'],
+    props: ['path'],
     created() {
-        for (const prop in this.$router.currentRoute.value.query) {
-            if (this.filters.includes(prop)) {
-                this.productsFilters[prop] = this.$router.currentRoute.value.query[prop];
-            }
+        console.log('Paginator created');
+        if (!this.$route.query.page) {
+            this.$router.push({path: '/shop', query: {...this.$route.query, page: 1}});
+        } else {
+            this.fetchData({path: this.path, ...this.$route.query});
         }
-        console.log(this.productsFilters);
-        this.getPaginatorData({path: this.path, page: this.$route.query.page});
     },
     data() {
         return {
@@ -49,67 +50,80 @@ export default {
             lastPage: ''
         }
     },
-    computed: {
-        productsFilters() {
-            return this.$store.getters.getProductsFilters;
-        }
-    },
-    watch: {
-        productsFilters: function() {
-            this.cache = {
-                paginatorData: {},
-                products: {}
-            }
-            this.getPaginatorData({path: this.path, page: 1});
-        }
-    },
     methods: {
         changePage(page) {
             if (page >= 1 && page <= this.lastPage) {
-                setTimeout(async () => {
-                    this.getPaginatorData({path: this.path, page: page});
-                    this.$router.replace({query: {...this.$route.query, page: page}});
+                this.scrollToTop();
+                setTimeout(() => {
+                    this.$router.push({ path: '/shop', query: { ...this.$route.query, page: page } });
                 }, 600);
             } else {
                 console.log(this.lastPage);
             }
         },
-        getPaginatorData(payload) {
-            const {path, page} = payload;
-            if (this.cache.paginatorData[page] && this.cache.products[page]) {
-                this.paginatorData = this.cache.paginatorData[page];
-                this.setPaginatorDataToData(this.cache.paginatorData[page]);
-                this.$store.commit('setProducts', this.cache.products[page].products);
-                console.log('данные получены из кеша');
+        fetchData(payload) {
+            const { path, page, clearCache } = payload;
+            if (clearCache) {
+                this.clearCache();
+                console.log('Cache cleared successfully!');
+            }
+            if (this.isDataCached(page)) {
+                this.loadCachedData(page);
+                console.log('Data retrieved from cache');
                 return;
             }
-            axios.get('/api/' + path, {params: {page: page, ...this.productsFilters}})
+            console.log(payload);
+            axios.get('/api/' + path, { params: payload })
                 .then(response => {
                     console.log(response.data);
-                    const data = response.data.data;
-                    const paginatorData = {...response.data};
+                    const products = response.data.data;
+                    const paginatorData = { ...response.data };
+                    //Remove arrows from links
                     paginatorData.links.shift();
                     paginatorData.links.pop();
-                    this.setPaginatorDataToData(paginatorData);
-                    this.$store.commit('setProducts', data);
-                    this.cache.paginatorData[page] = {
-                        current_page: paginatorData.current_page,
-                        last_page: paginatorData.last_page,
-                        links: paginatorData.links
-                    }
-                    this.cache.products[page] = {
-                        products: data
-                    }
 
+                    this.setPaginatorDataToData(paginatorData);
+                    this.$store.commit('setProducts', products);
+                    this.cacheData(page, paginatorData, products);
                 })
                 .catch((error) => {
                     console.error(error);
                 });
         },
+        clearCache() {
+            this.cache = {
+                paginatorData: {},
+                products: {}
+            };
+        },
+        isDataCached(page) {
+            return this.cache.paginatorData[page] && this.cache.products[page];
+        },
+        loadCachedData(page) {
+            this.paginatorData = this.cache.paginatorData[page];
+            this.setPaginatorDataToData(this.cache.paginatorData[page]);
+            this.$store.commit('setProducts', this.cache.products[page].products);
+        },
+        cacheData(page, paginatorData, products) {
+            this.cache.paginatorData[page] = {
+                current_page: paginatorData.current_page,
+                last_page: paginatorData.last_page,
+                links: paginatorData.links
+            };
+            this.cache.products[page] = {
+                products: products
+            };
+        },
         setPaginatorDataToData(paginatorData) {
             this.links = paginatorData.links;
             this.currentPage = paginatorData.current_page;
             this.lastPage = paginatorData.last_page;
+        },
+        scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
         }
     },
 };
