@@ -1,4 +1,5 @@
 <template>
+    <buy-goods-modal/>
     <div id="low-screen-balance-block">
         <div id="low-screen-balance-block-items">
             <div>
@@ -60,6 +61,8 @@
             </div>
         </div>
     </div>
+
+
     <div id="cards-area">
         <div v-for="Product in Products" :key="Product.id">
             <div class="card">
@@ -67,14 +70,14 @@
                      :src="'/storage/uploads/' + Product.img + '.png'">
                 <div class="card-body">
                     <div class="card-title">
-                        <h4>{{Product.id}} {{ Product.name }}</h4>
+                        <h4>{{ Product.name }}</h4>
                     </div>
                     <div class="card-text">
                         {{ Product.mod }}
                     </div>
                     <div class="card-button-area">
-                        <button class="butt card-btn" :item-name="Product.name" :item-id="Product.id"
-                                :item-cost="Product.price">
+                        <button class="butt card-btn"
+                                @click="openModal({ name: Product.name, id: Product.id, price: Product.price })">
                             {{ Product.price }}
                             <i class="fa-solid fa-coins" id="card-coins"></i>
                         </button>
@@ -82,7 +85,7 @@
                 </div>
             </div>
         </div>
-        <div style="width: 100%"></div>
+        <div style="width: 100%"></div> <!-- Block-hack so that the paginator is always positioned below the cards. -->
         <div class="mt-3">
             <paginator ref="paginator" :path="'shop/products'"></paginator>
         </div>
@@ -91,11 +94,13 @@
 
 <script>
 import Paginator from "./Paginator.vue";
+import BuyGoodsModal from "./BuyGoodsModal.vue";
 
 export default {
     name: "Shop",
     components: {
-        Paginator
+        Paginator,
+        BuyGoodsModal
     },
     data() {
         return {
@@ -164,6 +169,11 @@ export default {
                 mod: ''
             }
             this.showFiltersResetButton = false;
+        },
+        openModal(productData) {
+            // console.log(productData);
+            this.$store.commit('addToCart', productData);
+            this.$store.dispatch('openModal', 'buy-goods-modal');
         }
     },
     beforeRouteUpdate(to, from, next) {
@@ -443,27 +453,6 @@ export default {
     width: 100px;
     padding: 7px;
     background: #5400c0 !important;
-}
-
-#buy-item-range {
-    text-align: center;
-    outline: none;
-    background: none;
-    width: 50px;
-    border: 1px solid gray;
-    border-radius: 10px;
-    color: lightgray;
-    font-size: 15px;
-}
-
-#buy-form {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-}
-
-.buy-label {
-    color: lightgray;
 }
 
 .dropdown-item:hover {
