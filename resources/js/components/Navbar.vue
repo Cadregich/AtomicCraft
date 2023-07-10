@@ -31,9 +31,19 @@
                             Дискорд
                         </router-link>
                     </li>
+                    <li class="nav-item" v-if="auth">
+                        <router-link :to="{ name: 'user-data' }" class="nav-link active" aria-current="page">
+                            User data
+                        </router-link>
+                    </li>
                 </ul>
 
                 <ul class="navbar-nav mb-2 mb-lg-0" id="navbar-auth-block">
+                    <li class="nav-item" v-if="!auth">
+                        <router-link :to="{ name: 'registration' }" class="nav-link active" aria-current="page">
+                            Зарегистрироваться
+                        </router-link>
+                    </li>
                     <li class="nav-item" v-if="!auth">
                         <router-link :to="{ name: 'login' }" class="nav-link active" aria-current="page">
                             Войти
@@ -44,8 +54,8 @@
             <!-- /.Left menu -->
             <!-- Right menu -->
             <div class="right-menu d-flex align-items-center order-lg-3 order-1 mb-auto ml-auto">
-                <div class="nav-item dropdown" v-if="auth">
-                    <ul class="navbar-nav mb-lg-0">
+                <div class="nav-item dropdown">
+                    <ul class="navbar-nav mb-lg-0" v-if="auth">
                         <li class="nav-item">
                             <div class="nav-link dropdown-toggle" href="#">
                                 Cadregich
@@ -59,8 +69,8 @@
                                     <button class="dropdown-item text-center">Кабинет</button>
                                 </router-link>
                             </li>
-                            <li>
-                                <router-link to="/logout" class="text-decoration-none">
+                            <li v-if="auth">
+                                <router-link :to="{ name: 'logout' }" class="text-decoration-none">
                                     <button class="dropdown-item text-center">Выйти</button>
                                 </router-link>
                             </li>
@@ -88,15 +98,19 @@
 </template>
 
 <script>
-import { Dropdown } from "bootstrap";
+import {Dropdown} from "bootstrap";
 
 export default {
     name: "Navbar",
     data() {
         return {
-            auth: true,
             isRightLinkInLeftMenu: false,
         };
+    },
+    computed: {
+        auth() {
+            return this.$store.getters.Auth;
+        }
     },
     methods: {
         replaceItemsDOM(size) {
@@ -213,6 +227,7 @@ export default {
     margin: 0;
     left: auto;
 }
+
 .dropdown-menu > * > * > * {
     color: black !important;
 }
@@ -227,6 +242,7 @@ export default {
         justify-content: center;
         text-align: center;
     }
+
     .left-menu {
         margin: 0.5rem 0;
     }
