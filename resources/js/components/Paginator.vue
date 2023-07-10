@@ -57,8 +57,6 @@ export default {
                 setTimeout(() => {
                     this.$router.push({ path: '/shop', query: { ...this.$route.query, page: page } });
                 }, 600);
-            } else {
-                console.log(this.lastPage);
             }
         },
         fetchData(payload) {
@@ -140,12 +138,12 @@ export default {
     border: black;
 }
 
-.pagination > .page-link.disabled, .disabled > .page-link {
+.pagination > .page-link, .disabled > .page-link {
     background-color: #410370 !important;
     color: white;
 }
 
-.pagination > .page-link.active, .active > .page-link {
+.pagination > .page-link, .active > .page-link {
     background-color: #5618db;
 }
 
