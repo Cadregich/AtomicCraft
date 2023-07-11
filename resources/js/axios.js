@@ -20,4 +20,12 @@ axios.interceptors.response.use(response => {
         return Promise.reject(error);
     });
 
+axios.interceptors.request.use(config => {
+    // Добавляем '/api' к началу URL
+    config.url = '/api' + config.url;
+    return config;
+}, error => {
+    return Promise.reject(error);
+});
+
 export default axios;

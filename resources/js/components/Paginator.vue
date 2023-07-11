@@ -71,7 +71,7 @@ export default {
                 return;
             }
             console.log(payload);
-            axios.get('/api/' + path, { params: payload })
+            axios.get('/' + path, { params: payload })
                 .then(response => {
                     console.log(response.data);
                     const products = response.data.data;

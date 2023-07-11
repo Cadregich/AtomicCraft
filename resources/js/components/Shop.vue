@@ -135,7 +135,7 @@ export default {
     },
     methods: {
         fetchMods() {
-            axios.get('/api/shop/goods-mods')
+            axios.get('/shop/goods-mods')
                 .then(res => {
                     this.Mods = res.data;
                 })

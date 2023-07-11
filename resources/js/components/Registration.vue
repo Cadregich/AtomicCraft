@@ -80,7 +80,7 @@ export default {
                 return;
             }
             try {
-                const response = await axios.post('/api/register', this.form);
+                const response = await axios.post('/register', this.form);
                 console.log(response.data);
                 this.$store.dispatch('login');
                 this.$router.push('/')
