@@ -13,17 +13,21 @@ export default {
     components: {
         Navbar
     },
+    async created() {
+        if (await this.$store.dispatch('getCookie', 'ait')) {
+            this.$store.dispatch('login');
+        }
+    }
 }
 </script>
 
 <style>
 body {
-    background: url('/images/backgrounds/bg.png') no-repeat;
-    background-position: center center;
     background-size: cover;
-    background-attachment: fixed;
+    background: url('/images/backgrounds/bg.png') no-repeat fixed center center;
     padding-bottom: 100px;
 }
+
 @media (min-width: 922px) {
     body {
         background-position: center top 63px;
