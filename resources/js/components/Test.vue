@@ -6,7 +6,7 @@
 export default {
     name: "Test",
     mounted() {
-        axios.get('api/test')
+        axios.get('/test')
             .then(res => {
                 console.log(res.data);
             })

@@ -63,7 +63,7 @@ export default {
     methods: {
         async login() {
             try {
-                const response = await axios.post('/api/login', {
+                const response = await axios.post('/login', {
                     email: this.email,
                     password: this.password,
                     remember: this.remember,

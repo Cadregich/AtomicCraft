@@ -44,7 +44,7 @@ export default {
     methods: {
         async getStatus() {
             try {
-                await axios.get('/api/data');
+                await axios.get('/data');
                 return 'success';
             } catch (error) {
                 return 'error';
