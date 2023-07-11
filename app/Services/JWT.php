@@ -53,7 +53,7 @@ class JWT
         if (!$authSession) {
             $this->authTime = config('sanctum.expiration');
         } else {
-            $this->authTime = null;
+            $this->authTime = 60;
         }
     }
 
