@@ -8,7 +8,7 @@
 export default {
     name: "UserData",
     mounted() {
-        axios.get('/user')
+        axios.get('/user/data')
             .then(responce => {
                 console.log(responce.data);
             })

@@ -21,7 +21,7 @@
 
             <template v-slot:modalFooter>
                 <button class="btn btn-primary" id="submit-buy-form"
-                        @click="closeModal(); openModal('thanks-modal')">
+                        @click="closeModal(); buyGoods(); openModal('thanks-modal')">
                     Перейти к оплате
                 </button>
                 <button class="btn btn-danger" type="button" data-bs-dismiss="modal">Отменить</button>
@@ -59,6 +59,7 @@ export default {
             let value = event.target.value.replace(/^0+/, '');
             if (value) {
                 if (!isNaN(value)) {
+                    value = parseInt(value); // Преобразуем в число
                     if (value < 1) {
                         this.productCount = 1;
                         event.target.value = 1;
@@ -71,9 +72,7 @@ export default {
                     }
                     this.productCount = value;
                 } else {
-                    if (value) {
-                        event.target.value = 1;
-                    }
+                    event.target.value = 1;
                 }
             } else {
                 this.productCount = 1;
@@ -86,6 +85,21 @@ export default {
 
         closeModal() {
             this.$store.dispatch('closeModal');
+        },
+
+        buyGoods() {
+            const orderData = {
+                'items-count': this.productCount,
+                'item-id': this.productData.id
+            };
+
+            axios.post('/shop/buy', orderData)
+                .then(response => {
+                    console.log(response.data);
+                })
+                .catch(error => {
+                    console.error(error);
+                });
         }
     },
     watch: {

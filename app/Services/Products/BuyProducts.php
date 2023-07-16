@@ -11,7 +11,7 @@ use InvalidArgumentException;
 
 class BuyProducts
 {
-    public function getPurchaseDetails($requestData): array
+    public function getPurchaseDetails($requestData, $userId): array
     {
         $itemCount = intval($requestData['items-count']);
         $itemId = intval($requestData['item-id']);
@@ -24,7 +24,7 @@ class BuyProducts
 
         return [
             'goods_id' => $goods->id,
-            'user_id' => auth()->id(),
+            'user_id' => $userId,
             'goods_name' => $goods->name,
             'goods_count' => $itemCount,
             'purchase_price' => $goods->price * $itemCount

@@ -1,5 +1,5 @@
 <template>
-    <buy-goods-modal/>
+    <buy-products-modal/>
     <div id="low-screen-balance-block">
         <div id="low-screen-balance-block-items">
             <div>
@@ -12,7 +12,7 @@
                     <button class="butt" id="balance-butt">Пополнить</button>
                 </div>
                 <div class="low-screen-purchases-history-butt-area d-flex justify-content-around">
-                    <router-link :to="{ name: 'shop.goods-history' }" class="butt purchases-history-butt">
+                    <router-link :to="{ name: 'shop.purchases-history' }" class="butt purchases-history-butt">
                         История
                     </router-link>
                 </div>
@@ -46,7 +46,7 @@
                     </ul>
                 </div>
                 <div class="purchases-history-butt-area">
-                    <router-link :to="{ name: 'shop.goods-history' }" class="butt purchases-history-butt"
+                    <router-link :to="{ name: 'shop.purchases-history' }" class="butt purchases-history-butt"
                                  id="normal-screen-purchases-history-butt">
                         История
                     </router-link>
@@ -55,7 +55,7 @@
             <div id="normal-screen-balance-block">
                 <div id="balance">
                     <div class="nobr" id="balance-text">Ваш баланс</div>
-                    999999 <i class="fa-solid fa-coins" id="balance-coins"></i>
+                    {{ balance }} <i class="fa-solid fa-coins" id="balance-coins"></i>
                 </div>
                 <button class="butt" id="balance-butt">Пополнить</button>
             </div>
@@ -94,16 +94,17 @@
 
 <script>
 import Paginator from "./Paginator.vue";
-import BuyGoodsModal from "./BuyGoodsModal.vue";
+import BuyProductsModal from "./BuyProductsModal.vue";
 
 export default {
     name: "Shop",
     components: {
         Paginator,
-        BuyGoodsModal
+        BuyProductsModal
     },
     data() {
         return {
+            balance: 0,
             filters: {
                 search: '',
                 mod: '',
@@ -119,6 +120,7 @@ export default {
     },
     mounted() {
         console.log('Shop mounted');
+        this.fetchBalance();
         this.fetchMods();
         this.adaptiveBalanceBoard();
 
@@ -134,6 +136,15 @@ export default {
         });
     },
     methods: {
+        fetchBalance() {
+            axios.get('/user/balance')
+                .then(res => {
+                    this.balance = res.data;
+                })
+                .catch(error => {
+                    console.log(error);
+                })
+        },
         fetchMods() {
             axios.get('/shop/goods-mods')
                 .then(res => {

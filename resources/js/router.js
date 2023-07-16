@@ -50,9 +50,9 @@ const router = createRouter({
             name: 'shop'
         },
         {
-            path: '/shop/goods-history',
-            component: () => import('./components/GoodsHistory.vue'),
-            name: 'shop.goods-history'
+            path: '/shop/purchases-history',
+            component: () => import('./components/PurchasesHistory.vue'),
+            name: 'shop.purchases-history'
         },
         {
             path: '/shop/paginator',
