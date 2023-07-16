@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Models\Mod;
@@ -16,10 +15,6 @@ use App\Models\Mod;
 |
 */
 
-Route::get('/user', function (Request $request) {
-    return [$request->user(), decrypt($request->cookie('ait'))];
-})->middleware('auth:sanctum');
-
 Route::post('clear-auth-cookie', function () {
     return response('Cookies deleted')
         ->cookie('ait', null, -1)
@@ -28,19 +23,26 @@ Route::post('clear-auth-cookie', function () {
 
 Route::namespace('App\Http\Controllers')->group(function () {
 
+    Route::get('/user/{data}', 'UserController@getUserData')->middleware('auth:sanctum');
+
     Route::namespace('Auth')->group(function () {
         Route::post('/register', 'RegisterController');
         Route::post('/login', 'LoginController');
         Route::post('/logout', 'LogoutController')->middleware('auth:sanctum');
     });
 
-});
+    Route::prefix('shop')->namespace('Shop')->group(function () {
 
-Route::get('shop/goods-mods', function () {
-    return Mod::orderBy('title', 'asc')->pluck('title');
-});
+        Route::get('/goods-mods', function () {
+            return Mod::orderBy('title', 'asc')->pluck('title');
+        });
+        Route::get('/products', 'ShopController');
+        Route::post('/buy', 'BuyController')->middleware('auth:sanctum');;
+        Route::get('/get-more-items', 'GetMoreItemsController')->middleware('auth:sanctum');;
 
-Route::get('/shop/products', \App\Http\Controllers\Shop\ShopController::class);
+    });
+
+});
 
 Route::get('/test', function (Request $request) {
     return $request->all();
