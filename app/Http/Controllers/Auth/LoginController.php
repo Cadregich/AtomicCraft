@@ -16,6 +16,10 @@ class LoginController extends Controller
         $this->jwt = $jwt;
     }
 
+    /**
+     * @throws ValidationException
+     */
+
     public function __invoke(Request $request)
     {
         $credentials = $this->validateCredentials($request);
@@ -37,7 +41,8 @@ class LoginController extends Controller
         return $this->jwt->login($user, ['Authorisation Success']);
     }
 
-    private function validateCredentials(Request $request) {
+    private function validateCredentials(Request $request): array
+    {
         return $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required'],

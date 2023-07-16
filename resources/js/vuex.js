@@ -4,6 +4,7 @@ import {Modal} from "bootstrap";
 const store = new Vuex.Store({
     state: {
         isAuthenticated: false,
+        userName: '',
         products: [],
         productsFilters: {},
         modal: null,
@@ -12,6 +13,9 @@ const store = new Vuex.Store({
     mutations: {
         setAuthentication(state, status) {
             state.isAuthenticated = status;
+        },
+        setUserName(state, name) {
+            state.userName = name;
         },
         setProducts(state, products) {
             state.products = products;
