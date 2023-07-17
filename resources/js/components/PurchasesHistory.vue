@@ -24,7 +24,7 @@
                     </tbody>
                 </table>
                 <div v-if="showLoadMoreButton" id="purchase-load-more-butt-area">
-                    <button @click="loadMorePurchases" id="load-more-button">Загрузить ещё</button>
+                    <button @click="getItems" id="load-more-button">Загрузить ещё</button>
                 </div>
             </div>
         </div>
@@ -66,9 +66,6 @@ export default {
                 .catch(error => {
                     console.log(error);
                 });
-        },
-        loadMorePurchases() {
-            this.getItems();
         }
     }
 }
@@ -105,7 +102,6 @@ export default {
 }
 
 #load-more-button {
-//display: none; padding: 3px; background: #a800ff;
     color: white;
     border: 0;
     border-radius: 5px;
