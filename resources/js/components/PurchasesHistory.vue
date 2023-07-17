@@ -105,6 +105,7 @@ export default {
     color: white;
     border: 0;
     border-radius: 5px;
+    background-color: #7911c9;
 }
 
 #load-more-button:hover {
