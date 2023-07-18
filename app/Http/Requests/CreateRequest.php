@@ -25,7 +25,7 @@ class CreateRequest extends FormRequest
     {
         return [
             'name' => '',
-            'mod_id' => '',
+            'mod' => '',
             'img' => '',
             'price' => '',
             'associations' => '',

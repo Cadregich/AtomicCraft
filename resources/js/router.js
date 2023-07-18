@@ -50,15 +50,15 @@ const router = createRouter({
             name: 'shop'
         },
         {
+            path: '/shop/create',
+            component: () => import('./components/ShopCreateProduct.vue'),
+            name: 'shop.create'
+        },
+        {
             path: '/shop/purchases-history',
             component: () => import('./components/PurchasesHistory.vue'),
             name: 'shop.purchases-history'
-        },
-        {
-            path: '/shop/paginator',
-            component: () => import('./components/Paginator.vue'),
-            name: 'shop.paginator'
-        },
+        }
     ],
 });
 

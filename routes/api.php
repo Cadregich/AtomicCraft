@@ -38,7 +38,8 @@ Route::namespace('App\Http\Controllers')->group(function () {
         });
         Route::get('/products', 'ShopController');
         Route::post('/buy', 'BuyController')->middleware('auth:sanctum');;
-        Route::get('/get-more-items', 'GetMoreItemsController')->middleware('auth:sanctum');;
+        Route::get('/get-more-items', 'GetMoreItemsController')->middleware('auth:sanctum');
+        Route::post('/create', 'ShopController@store')->name('goods-store');
 
     });
 

@@ -14,9 +14,9 @@ class StoreProducts
     {
         $data = $request->validated();
         $img = $request->file('img');
-        $mod = $data['mod_id'];
+        $mod = $data['mod'];
         $associations = $this->getAssociationsFromString($request['associations']);
-        unset($data['associations'], $data['img'], $data['mod_id']);
+        unset($data['associations'], $data['img'], $data['mod']);
         $latestItemId = Product::first() === null ? 0 : Product::latest()->first()->id;
 
         try {
@@ -66,7 +66,7 @@ class StoreProducts
             'name' => $data['name'],
             'mod_id' => $modId,
             'img' => 'item' . ($latestItemId + 1) . '.' . $imgExtension,
-            'price' => $data['price'],
+            'price' => intval($data['price']),
         ]);
     }
     private function storeImg($img, $latestItemId)

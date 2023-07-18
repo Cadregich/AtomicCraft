@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Shop;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CreateRequest;
 use App\Http\Requests\GoodsSearchRequest;
-use App\Models\Mod;
 use App\Services\Products\BuildProductsQuery;
 use App\Services\Products\StoreProducts;
 
@@ -27,7 +26,6 @@ class ShopController extends Controller
 
     public function store(CreateRequest $request)
     {
-        $storeCondition = ($this->storeGoodsService)($request);
-        return redirect()->route('goods-create')->with('status', $storeCondition);
+        return ($this->storeGoodsService)($request);
     }
 }
