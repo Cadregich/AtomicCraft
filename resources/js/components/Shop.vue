@@ -6,8 +6,7 @@
                 <div id="balance-low-screen">
                     <div id="balance-low-screen-balance">
                         <div class="nobr" id="balance-text">Ваш баланс</div>
-                        999999
-                        <i class="fa-solid fa-coins" id="balance-coins"></i>
+                        {{ balance }} <i class="fa-solid fa-coins" id="balance-coins"></i>
                     </div>
                     <button class="butt" id="balance-butt">Пополнить</button>
                 </div>
@@ -67,7 +66,7 @@
         <div v-for="Product in Products" :key="Product.id">
             <div class="card">
                 <img class="card-img-top" :alt="Product.name"
-                     :src="'/storage/uploads/' + Product.img + '.png'">
+                     :src="'/storage/uploads/' + Product.img">
                 <div class="card-body">
                     <div class="card-title">
                         <h4>{{ Product.name }}</h4>
