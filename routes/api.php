@@ -31,8 +31,14 @@ Route::namespace('App\Http\Controllers')->group(function () {
         Route::post('/logout', 'LogoutController')->middleware('auth:sanctum');
     });
 
-    Route::prefix('shop')->namespace('Shop')->group(function () {
+    Route::prefix('cabinet')->namespace('Cabinet')->group(function () {
+        Route::get('/', 'CabinetController');
+        Route::post('/skin', 'PlayerAssetsController@upload');
+        Route::delete('/skin', 'PlayerAssetsController@reset');
+        Route::post('/check-daily-gift', 'DailyGiftController');
+    });
 
+    Route::prefix('shop')->namespace('Shop')->group(function () {
         Route::get('/goods-mods', function () {
             return Mod::orderBy('title', 'asc')->pluck('title');
         });
@@ -40,7 +46,6 @@ Route::namespace('App\Http\Controllers')->group(function () {
         Route::post('/buy', 'BuyController')->middleware('auth:sanctum');;
         Route::get('/get-more-items', 'GetMoreItemsController')->middleware('auth:sanctum');
         Route::post('/create', 'ShopController@store')->name('goods-store');
-
     });
 
 });
