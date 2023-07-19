@@ -55,21 +55,21 @@
             <!-- Right menu -->
             <div class="right-menu d-flex align-items-center order-lg-3 order-1 mb-auto ml-auto">
                 <div class="nav-item dropdown">
-                    <ul class="navbar-nav mb-lg-0" v-if="auth">
-                        <li class="nav-item">
+                    <ul class="navbar-nav mb-lg-0">
+                        <li class="nav-item" v-if="auth">
                             <div class="nav-link dropdown-toggle" href="#">
                                 Cadregich
                             </div>
                         </li>
                     </ul>
-                    <div class="d-flex flex-column align-items-start">
+                    <div class="d-flex flex-column align-items-start" v-if="auth">
                         <ul class="dropdown-menu dropdown-menu-end flex-column">
                             <li>
                                 <router-link to="/cabinet" class="text-decoration-none">
                                     <button class="dropdown-item text-center">Кабинет</button>
                                 </router-link>
                             </li>
-                            <li v-if="auth">
+                            <li>
                                 <router-link :to="{ name: 'logout' }" class="text-decoration-none">
                                     <button class="dropdown-item text-center">Выйти</button>
                                 </router-link>
@@ -132,45 +132,50 @@ export default {
             this.replaceItemsDOM(window.innerWidth);
         });
         this.replaceItemsDOM(window.innerWidth);
-        const element = document.getElementsByClassName("dropdown")[0];
-        const elementMenu = document.getElementsByClassName("dropdown-menu")[0];
-        const dropdown = new Dropdown(element);
+    },
+    updated() {
+        if (this.auth) {
+            const element = document.getElementsByClassName("dropdown")[0];
+            const elementMenu = document.getElementsByClassName("dropdown-menu")[0];
+            const dropdown = new Dropdown(element);
 
-        function handleClick() {
-            dropdown.show();
-            elementMenu.style.display = "flex";
-            element.removeEventListener("click", handleClick);
+            function handleClick() {
+                dropdown.show();
+                elementMenu.style.display = "flex";
+                element.removeEventListener("click", handleClick);
 
-            function resetClick() {
+                function resetClick() {
+                    dropdown.hide();
+                    elementMenu.style.display = "none";
+                    element.addEventListener("click", handleClick);
+                }
+
+                function handleClickOutside(event) {
+                    if (!element.contains(event.target)) {
+                        resetClick();
+                    }
+                }
+
+                element.addEventListener("click", resetClick);
+                document.addEventListener("click", handleClickOutside);
+            }
+
+            element.addEventListener("click", handleClick);
+
+            element.addEventListener("mouseenter", function () {
+                dropdown.show();
+                elementMenu.style.display = "flex";
+            });
+            element.addEventListener("mouseleave", function () {
                 dropdown.hide();
                 elementMenu.style.display = "none";
-                element.addEventListener("click", handleClick);
-            }
-
-            function handleClickOutside(event) {
-                if (!element.contains(event.target)) {
-                    resetClick();
-                }
-            }
-
-            element.addEventListener("click", resetClick);
-            document.addEventListener("click", handleClickOutside);
+            });
+            element.addEventListener("mouseleave", function () {
+                dropdown.hide();
+                elementMenu.style.display = "none";
+            });
         }
 
-        element.addEventListener("click", handleClick);
-
-        element.addEventListener("mouseenter", function () {
-            dropdown.show();
-            elementMenu.style.display = "flex";
-        });
-        element.addEventListener("mouseleave", function () {
-            dropdown.hide();
-            elementMenu.style.display = "none";
-        });
-        element.addEventListener("mouseleave", function () {
-            dropdown.hide();
-            elementMenu.style.display = "none";
-        });
     }
 };
 </script>
