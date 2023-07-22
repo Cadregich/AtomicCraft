@@ -75,14 +75,20 @@ const store = new Vuex.Store({
         },
     },
     getters: {
+        userName: (state) => {
+            return state.userName;
+        },
+
         Auth: state => state.isAuthenticated,
 
         getPaginatorResult: (state) => {
             return state.products;
         },
+
         getProductsFilters: (state) => {
             return state.productsFilters;
         },
+
         getCart: (state) => {
             return state.cart;
         }

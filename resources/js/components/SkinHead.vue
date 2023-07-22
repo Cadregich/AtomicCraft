@@ -1,171 +1,119 @@
 <template>
-    <canvas class="skinHead" :width="size" :height="size" :type="type"></canvas>
+    <canvas ref="skinHead" :width="size" :height="size"></canvas>
 </template>
 
 <script>
 export default {
     name: "SkinHead",
-    props: ['size', 'type'],
+    props: ['texturePath', 'size', 'type'],
     mounted() {
         this.initializeFaceRender();
     },
     methods: {
-        faceRender(ctx, canvas) {
+        drawTexture(ctx, canvas, type, path) {
+            if (!path) {
+                path = this.texturePath;
+            }
             const image = new Image();
-            image.src = "/storage/player/skin.png?t=" + new Date().getTime();
+            image.src = path + "?t=" + new Date().getTime();
+            image.onload = () => {
+                const canvasWidth = canvas.width;
+                const canvasHeight = canvas.height;
+                const textureWidth = image.width;
+                const textureHeight = image.height;
 
-            image.onload = function () {
-                const skinWidth = this.width;
-                const skinHeight = this.height;
+                const validWidths = [64, 128, 256, 512, 1024];
+                const validHeights = [32, 64, 128, 256, 512, 1024];
 
-                if ((skinHeight !== 32 && skinHeight !== 64 && skinHeight !== 128 && skinHeight !== 256 && skinHeight !== 512) ||
-                    (skinWidth !== 64 && skinWidth !== 128 && skinWidth !== 256 && skinWidth !== 512)) {
-                    console.error('Face Render: Invalid skin size');
+                if (!validWidths.includes(textureWidth) || !validHeights.includes(textureHeight)) {
+                    console.error('Face Render: Invalid texture size');
                     return;
                 }
 
-                const canvasWidth = canvas.width;
-                const canvasHeight = canvas.height;
+                let indentsAndSize = {};
 
-                if (canvasWidth < 64 || canvasHeight < 64) {
-                    console.warn('Face Render: Low canvas size');
+                if (type === 'cape') {
+                    indentsAndSize = {
+                        width: 12,
+                        height: 8,
+                    };
+                } else if (type === 'skin') {
+                    indentsAndSize = {
+                        FirstLayer: 8,
+                        SecondLayer: 8,
+                        indentXSecondLayer: 40
+                    };
                 }
 
-                if (canvasWidth !== canvasHeight) {
-                    console.warn('Face Render: The width of the canvas is not equal to its height');
+                /*
+                Calculate Image Size Multiplier Based On Texture Width
+                We need to increase the padding and texture sizes depending on the width of the texture,
+                to correctly display the image on the canvas according to its size.
+                Use base 2 logarithmic operation to determine magnification.
+                Subtract 6 From The Logarithm To Consider That Initially For A 64px Texture
+                the size has been set to 1, and the sizeMultiplier for it will be 1 (2^0 = 1).
+                */
+
+                const sizeMultiplier = 2 ** (Math.log2(textureWidth) - 6);
+                for (let key in indentsAndSize) {
+                    indentsAndSize[key] *= sizeMultiplier;
                 }
 
-                const imageWidth = canvasWidth - (canvasWidth * (8 / 100));    // To reduce the first layer so that the second is in front
-                const imageHeight = canvasHeight - (canvasHeight * (8 / 100)); // To reduce the first layer so that the second is in front
-                const canvasDX = (canvasWidth - imageWidth) / 2;   // To center the first layer
-                const canvasDY = (canvasHeight - imageHeight) / 2; // To center the first layer
-
-                const indentsAndSize = {
-                    FirstLayer: 8,
-                    SecondLayer: 8,
-                    indentXSecondLayer: 40
-                };
-
-                if (skinWidth === 128) {
-                    for (let key in indentsAndSize) {
-                        indentsAndSize[key] *= 2;
-                    }
-                } else if (skinWidth === 256) {
-                    for (let key in indentsAndSize) {
-                        indentsAndSize[key] *= 4;
-                    }
-                } else if (skinWidth === 512) {
-                    for (let key in indentsAndSize) {
-                        indentsAndSize[key] *= 8;
-                    }
+                if (type === 'skin') {
+                    const imageWidth = canvasWidth - (canvasWidth * (8 / 100));    // To reduce the first layer so that the second is in front
+                    const imageHeight = canvasHeight - (canvasHeight * (8 / 100)); // To reduce the first layer so that the second is in front
+                    const canvasDX = (canvasWidth - imageWidth) / 2;   // To center the first layer
+                    const canvasDY = (canvasHeight - imageHeight) / 2; // To center the first layer
+                    ctx.drawImage(
+                        image,
+                        indentsAndSize["FirstLayer"],
+                        indentsAndSize["FirstLayer"],
+                        indentsAndSize["FirstLayer"],
+                        indentsAndSize["FirstLayer"],
+                        canvasDX,
+                        canvasDY,
+                        imageWidth,
+                        imageHeight
+                    );
+                    ctx.drawImage(
+                        image,
+                        indentsAndSize["indentXSecondLayer"],
+                        indentsAndSize["SecondLayer"],
+                        indentsAndSize["SecondLayer"],
+                        indentsAndSize["SecondLayer"],
+                        0,
+                        0,
+                        canvasWidth,
+                        canvasHeight
+                    );
+                } else if (type === 'cape') {
+                    ctx.drawImage(
+                        image,
+                        0,
+                        5,
+                        indentsAndSize['width'],
+                        indentsAndSize['height'],
+                        0,
+                        0,
+                        canvasWidth,
+                        canvasHeight
+                    );
                 }
-                // First layer
-                ctx.drawImage(
-                    image,
-                    indentsAndSize["FirstLayer"],
-                    indentsAndSize["FirstLayer"],
-                    indentsAndSize["FirstLayer"],
-                    indentsAndSize["FirstLayer"],
-                    canvasDX,
-                    canvasDY,
-                    imageWidth,
-                    imageHeight
-                );
-                // Second layer
-                ctx.drawImage(
-                    image,
-                    indentsAndSize["indentXSecondLayer"],
-                    indentsAndSize["SecondLayer"],
-                    indentsAndSize["SecondLayer"],
-                    indentsAndSize["SecondLayer"],
-                    0,
-                    0,
-                    canvasWidth,
-                    canvasHeight
-                );
-            }
+            };
         },
 
-        capeRender(ctx, canvas) {
-            const image = new Image();
-            image.src = "/storage/player/cape.png?t=" + new Date().getTime();
-            image.onload = function () {
-                const capeWidth = this.width;
-                const capeHeight = this.height;
-                if ((capeWidth !== 64 && capeWidth !== 128 && capeWidth !== 256 && capeWidth !== 512 && capeWidth !== 1024) ||
-                    (capeHeight !== 32 && capeHeight !== 64 && capeHeight !== 128 && capeHeight !== 256 && capeHeight !== 512 && capeHeight !== 1024)) {
-                    console.error('Face Render: Invalid cape size');
-                }
-
-                const croppedArea = {
-                    width: 12,
-                    height: 8,
-                };
-
-                if (capeWidth === 128) {
-                    for (let key in croppedArea) {
-                        croppedArea[key] *= 2;
-                    }
-                } else if (capeWidth === 256) {
-                    for (let key in croppedArea) {
-                        croppedArea[key] *= 4;
-                    }
-                } else if (capeWidth === 512) {
-                    for (let key in croppedArea) {
-                        croppedArea[key] *= 8;
-                    }
-                } else if (capeWidth === 1024) {
-                    for (let key in croppedArea) {
-                        croppedArea[key] *= 16;
-                    }
-                }
-
-                // Cape
-                ctx.drawImage(
-                    image,
-                    0,
-                    5,
-                    croppedArea['width'],
-                    croppedArea['height'],
-                    0,
-                    0,
-                    canvas.width,
-                    canvas.height
-                );
-            }
-        },
-
-        initializeFaceRender() {
-            const canvasElements = document.querySelectorAll(".skinHead");
-            canvasElements.forEach((canvas) => {
-                const imageType = canvas.getAttribute('type');
-                const ctx = canvas.getContext("2d");
-                this.removeBlurFromCanvas(canvas, ctx);
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                if (imageType !== 'cape') {
-                    this.faceRender(ctx, canvas);
-                } else {
-                    this.capeRender(ctx, canvas);
-                }
-            });
+        initializeFaceRender(path = null) {
+            const canvas = this.$refs.skinHead;
+            const ctx = canvas.getContext("2d");
+            this.removeBlurFromCanvas(canvas, ctx);
+            ctx.clearRect(0, 0, this.size, this.size);
+            this.drawTexture(ctx, canvas, this.type, path);
         },
 
         removeBlurFromCanvas(canvas, ctx) {
-            ctx.mozImageSmoothingEnabled = false;
-            ctx.webkitImageSmoothingEnabled = false;
-            ctx.msImageSmoothingEnabled = false;
             ctx.imageSmoothingEnabled = false;
-            ctx.imageSmoothingEnabled = false;
-            canvas.style.imageRendering = "optimizeSpeed";
-            canvas.style.imageRendering = "-moz-crisp-edges";
-            canvas.style.imageRendering = "-o-crisp-edges";
             canvas.style.imageRendering = "pixelated";
-            canvas.style.msInterpolationMode = "nearest-neighbor";
         }
     }
 }
 </script>
-
-<style scoped>
-
-</style>

@@ -17,17 +17,21 @@ let skinViewer;
 export default {
 
     name: "SkinViewer",
+    props: ['skinPath', 'capePath'],
     mounted() {
         const availableAnimations = {
             walk: new skinview3d.WalkingAnimation(),
             run: new skinview3d.RunningAnimation()
         };
 
-        function initializeViewer() {
+        this.initializeViewer(availableAnimations);
+    },
+    methods: {
+        initializeViewer(availableAnimations) {
             skinViewer = new skinview3d.SkinViewer({
                 canvas: document.getElementById("skin_container"),
-                skin: "/storage/player/skin.png?t=" + new Date().getTime(),
-                cape: "/storage/player/cape.png?t=" + new Date().getTime(),
+                skin: this.skinPath + "?t=" + new Date().getTime(),
+                cape: this.capePath ? this.capePath + "?t=" + new Date().getTime() : undefined,
                 width: '250',
                 height: '400'
             });
@@ -41,8 +45,8 @@ export default {
             skinViewer.controls.enablePan = false;
 
             const animationButtons = document.querySelectorAll('button[name="animation"]');
-            animationButtons.forEach(function(button) {
-                button.addEventListener('click', function() {
+            animationButtons.forEach(function (button) {
+                button.addEventListener('click', function () {
                     const animationName = button.value;
                     if (animationName !== "") {
                         skinViewer.animation = availableAnimations[animationName];
@@ -51,11 +55,7 @@ export default {
                     }
                 });
             });
-        }
-
-        initializeViewer();
-    },
-    methods: {
+        },
         reloadTexture(input, type) {
             let textureUrl = URL.createObjectURL(input);
             if (type === 'skin') {
@@ -101,9 +101,11 @@ export default {
     bottom: 1px;
     background-color: rgb(5, 121, 204);
 }
+
 .skin-animation-buttons > button:active {
     top: 1px;
 }
+
 @media (max-width: 270px) {
     .skin {
         order: -1;

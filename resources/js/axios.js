@@ -16,6 +16,7 @@ axios.interceptors.response.use(response => {
 
             store.dispatch('logout');
             router.push({name: 'login'});
+            store.commit('setUserName', '');
         }
         return Promise.reject(error);
     });

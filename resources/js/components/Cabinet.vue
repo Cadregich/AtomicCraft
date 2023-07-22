@@ -1,15 +1,15 @@
 <template>
     <div class="skin-block">
         <div class="skin-butt atomic-block column-center row-gap-2" id="skin-butt-skin">
-            <nobr class="skin-butt-title">Изменить скин</nobr>
-            <skin-head ref="skinHead" size="50" type="skin"></skin-head>
+            <div class="skin-butt-title">Изменить скин</div>
+            <template v-if="skinPath">
+                <skin-head ref="skinHead" size="50" type="skin" :texture-path="skinPath"></skin-head>
+            </template>
             <div class="upload-and-remove-skin column-center">
                 <label for="skin-upload" class="change-skin-butt">
-                    <nobr>
-                        <i class="fa-sharp fa-solid fa-share"></i> Загрузить
-                        <input @change="uploadSkin($event, 'skin')" id="skin-upload" class="d-none" type="file"
-                               name="file" accept="png">
-                    </nobr>
+                    <i class="fa-sharp fa-solid fa-share"></i> Загрузить
+                    <input @change="uploadSkin($event, 'skin')" id="skin-upload" class="d-none" type="file"
+                           name="file" accept="png">
                 </label>
                 <button @click="removeSkin" type="submit" class="remove-skin-butt" id="removeSkin" title="Удалить скин"
                         value="">
@@ -17,17 +17,19 @@
                 </button>
             </div>
         </div>
-        <skinViewer ref="skinViewerRef"></skinViewer>
+        <template v-if="skinPath">
+            <skinViewer ref="skinViewerRef" :skin-path="skinPath" :cape-path="capePath"></skinViewer>
+        </template>
         <div class="skin-butt atomic-block column-center row-gap-2" id="skin-butt-cape">
-            <nobr class="skin-butt-title">Изменить плащ</nobr>
-            <skin-head size="50" type="cape"></skin-head>
+            <div class="skin-butt-title">Изменить плащ</div>
+            <template v-if="capePath">
+                <skin-head ref="skinCape" size="50" type="cape" :texture-path="capePath"></skin-head>
+            </template>
             <div class="upload-and-remove-skin column-center" id="cape-url">
                 <label for="cape-upload" class="change-skin-butt">
-                    <nobr>
-                        <i class="fa-sharp fa-solid fa-share"></i> Загрузить
-                        <input @change="uploadSkin($event, 'cape')" id="cape-upload" class="d-none" type="file"
-                               name="file" accept="png">
-                    </nobr>
+                    <i class="fa-sharp fa-solid fa-share"></i> Загрузить
+                    <input @change="uploadSkin($event, 'cape')" id="cape-upload" class="d-none" type="file"
+                           name="file" accept="png">
                 </label>
                 <button @click="removeSkin" type="submit" class="remove-skin-butt" id="removeCape" title="Удалить скин">
                     <i class="fa-solid fa-trash-can"></i> Удалить
@@ -47,8 +49,27 @@ export default {
         SkinViewer: skinViewer,
         skinHead
     },
-    date() {
-        return {}
+    data() {
+        return {
+            skinPath: '',
+            capePath: ''
+        }
+    },
+    computed: {
+        userName() {
+            return this.$store.getters.userName;
+        },
+    },
+    mounted() {
+        axios.get('/cabinet')
+            .then(res => {
+                console.log(res.data);
+                this.skinPath = res.data.skinPath;
+                this.capePath = res.data.capePath;
+            })
+            .catch(error => {
+                console.log(error);
+            })
     },
     methods: {
         uploadSkin(event, type) {
@@ -63,18 +84,25 @@ export default {
                 console.error('Upload asset error: type error');
             }
 
-            this.$refs.skinViewerRef.reloadTexture(formData.get(type), type);
             axios.post('/cabinet/skin', formData)
-                .then(() => {
-                    this.$refs.skinHead.initializeFaceRender();
+                .then(res => {
+                    console.log(res.data);
+                    if (type === 'skin') {
+                        this.skinPath = res.data.skinPath;
+                        this.$refs.skinHead.initializeFaceRender(this.skinPath);
+                    } else if (type === 'cape') {
+                        this.capePath = res.data.capePath;
+                        this.$refs.skinCape.initializeFaceRender(this.capePath);
+                    }
+                    this.$refs.skinViewerRef.reloadTexture(formData.get(type), type);
                 })
                 .catch(error => {
                     console.log(error);
                 });
         },
         removeSkin() {
-            alert('Удалить скин');
-        }
+            //TODO: Implement removeSkin method
+        },
     }
 }
 </script>

@@ -100,12 +100,12 @@ class JWT
      * @return \Illuminate\Http\JsonResponse
      */
 
-    public function login(mixed $user, array $responceData = [])
+    public function login(mixed $user)
     {
         $jwt = $user->createToken($this->tokenName);
         $cookieJWT = $this->createJWTCookie($jwt->plainTextToken);
         $cookieAIT = $this->createAITCookie();
 
-        return response()->json($responceData)->withCookie($cookieJWT)->withCookie($cookieAIT);
+        return response()->json($user->name)->withCookie($cookieJWT)->withCookie($cookieAIT);
     }
 }
