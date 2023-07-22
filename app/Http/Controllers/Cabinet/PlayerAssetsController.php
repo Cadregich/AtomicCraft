@@ -41,12 +41,11 @@ class PlayerAssetsController extends Controller
     public function reset(Request $request)
     {
         $userName = $request->user()->name;
-        $decodeData = $request->json()->all();
-        $defaultSkinPath = storage_path('app/public/player/defaultSkin.png');
-        $currentSkinPath = public_path('storage/player/skin/' . $userName . '.png');
-        $capePath = public_path('storage/player/cape/' . $userName . '.png');
+        $type = $request->input('type');
+        $currentSkinPath = 'storage/player/skin/' . $userName . '.png';
+        $capePath = 'storage/player/cape/' . $userName . '.png';
         try {
-            $this->userAssets->remove($decodeData, $defaultSkinPath, $currentSkinPath, $capePath);
+            $this->userAssets->remove($type, $currentSkinPath, $capePath);
             return $this->userAssets->getSkinAndCapePaths($userName);
         } catch (\Exception $e) {
             return 'Asset reset error ' . $e;
