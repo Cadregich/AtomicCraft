@@ -3,19 +3,16 @@
 namespace App\Http\Controllers\Cabinet;
 
 use App\Http\Controllers\Controller;
-use App\Services\Cabinet\ResetSkin;
-use App\Services\Cabinet\UploadSkin;
+use App\Services\Cabinet\PlayerAssetsService;
 use Illuminate\Http\Request;
 
 class PlayerAssetsController extends Controller
 {
-    protected $uploadSkinService;
-    protected $resetSkinService;
+    protected $userAssets;
 
-    public function __construct(UploadSkin $uploadSkinService, ResetSkin $resetSkinService)
+    public function __construct(PlayerAssetsService $userAssets)
     {
-        $this->uploadSkinService = $uploadSkinService;
-        $this->resetSkinService = $resetSkinService;
+        $this->userAssets = $userAssets;
     }
 
     /**
@@ -26,10 +23,12 @@ class PlayerAssetsController extends Controller
 
     public function upload(Request $request)
     {
+        $userName = $request->user()->name;
         try {
-            return ($this->uploadSkinService)($request);
+            $this->userAssets->upload($request, $userName);
+            return $this->userAssets->getSkinAndCapePaths($userName);
         } catch (\Exception $e) {
-            return 'Skin or cape upload error ' . $e;
+            return 'Asset upload error ' . $e;
         }
     }
 
@@ -41,14 +40,16 @@ class PlayerAssetsController extends Controller
 
     public function reset(Request $request)
     {
+        $userName = $request->user()->name;
         $decodeData = $request->json()->all();
-        $defaultSkinPath = storage_path('app/public/defaultSkin.png');
-        $currentSkinPath = public_path('storage/player/skin.png');
-        $capePath = public_path('storage/player/cape.png');
+        $defaultSkinPath = storage_path('app/public/player/defaultSkin.png');
+        $currentSkinPath = public_path('storage/player/skin/' . $userName . '.png');
+        $capePath = public_path('storage/player/cape/' . $userName . '.png');
         try {
-            return ($this->resetSkinService)($decodeData, $defaultSkinPath, $currentSkinPath, $capePath);
+            $this->userAssets->remove($decodeData, $defaultSkinPath, $currentSkinPath, $capePath);
+            return $this->userAssets->getSkinAndCapePaths($userName);
         } catch (\Exception $e) {
-            return 'Skin or cape reset error ' . $e;
+            return 'Asset reset error ' . $e;
         }
     }
 }

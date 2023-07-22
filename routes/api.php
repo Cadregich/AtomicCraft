@@ -22,7 +22,6 @@ Route::post('clear-auth-cookie', function () {
 });
 
 Route::namespace('App\Http\Controllers')->group(function () {
-
     Route::get('/user/{data}', 'UserController@getUserData')->middleware('auth:sanctum');
 
     Route::namespace('Auth')->group(function () {
@@ -31,13 +30,13 @@ Route::namespace('App\Http\Controllers')->group(function () {
         Route::post('/logout', 'LogoutController')->middleware('auth:sanctum');
     });
 
-    Route::prefix('cabinet')->namespace('Cabinet')->group(function () {
+    Route::middleware('auth:sanctum')->prefix('cabinet')->namespace('Cabinet')->group(function () {
         Route::get('/', 'CabinetController');
         Route::post('/skin', 'PlayerAssetsController@upload');
         Route::delete('/skin', 'PlayerAssetsController@reset');
         Route::post('/check-daily-gift', 'DailyGiftController');
+        Route::get('/assetPaths', 'CabinetController@getSkinAndCapePaths');
     });
-
     Route::prefix('shop')->namespace('Shop')->group(function () {
         Route::get('/goods-mods', function () {
             return Mod::orderBy('title', 'asc')->pluck('title');
