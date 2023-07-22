@@ -38,7 +38,7 @@ class LoginController extends Controller
         $user = Auth::user();
         $user->tokens()->delete();
 
-        return $this->jwt->login($user, ['Authorisation Success']);
+        return $this->jwt->login($user);
     }
 
     private function validateCredentials(Request $request): array
