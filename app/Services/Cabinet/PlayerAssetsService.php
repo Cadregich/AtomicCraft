@@ -2,14 +2,12 @@
 
 namespace App\Services\Cabinet;
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
-use Exception;
 
 class PlayerAssetsService
 {
     /**
-     * @throws Exception
+     * @throws \Exception
      */
 
     public function upload($request, $userName): bool
@@ -23,38 +21,34 @@ class PlayerAssetsService
             $cape->storeAs('public/player/cape', $userName . '.png');
             return true;
         } else {
-            throw new Exception('Asset is not recognized');
+            throw new \Exception('Asset is not recognized');
         }
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
 
-    public function remove($arr, $defaultSkinPath, $currentSkinPath, $capePath): bool
+    public function remove($type, $currentSkinPath, $capePath): void
     {
-        if (File::exists($defaultSkinPath)) {
-            if ($arr['type'] === 'skin') {
-                //File::delete($currentSkinPath);
-                if (File::exists($currentSkinPath)) {
-                    File::copy($defaultSkinPath, $currentSkinPath);
-                    return true;
-                }
-            } elseif ($arr['type'] === 'cape') {
-                if (File::exists($capePath)) {
-                    File::delete($capePath);
-                    return true;
-                }
+        if ($type === 'skin') {
+            if (File::exists($currentSkinPath)) {
+                File::delete($currentSkinPath);
             } else {
-                throw new Exception('Asset type error');
+                throw new \Exception('File ' . $currentSkinPath . ' not found');
+            }
+        } else if ($type === 'cape') {
+            if (File::exists($capePath)) {
+                File::delete($capePath);
+            } else {
+                throw new \Exception('File' . $capePath . 'not found');
             }
         } else {
-            throw new Exception('Server error, skin not fount att ' . $defaultSkinPath);
+            throw new \InvalidArgumentException('File' . $capePath . 'not found');
         }
-        throw new Exception('Unknown error');
     }
 
-    public function getSkinAndCapePaths($userName)
+    public function getSkinAndCapePaths($userName): array
     {
         $skinPath = 'storage/player/defaultSkin.png';
         $capePath = '';
