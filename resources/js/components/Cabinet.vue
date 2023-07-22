@@ -8,10 +8,11 @@
             <div class="upload-and-remove-skin column-center">
                 <label for="skin-upload" class="change-skin-butt">
                     <i class="fa-sharp fa-solid fa-share"></i> Загрузить
-                    <input @change="uploadSkin($event, 'skin')" id="skin-upload" class="d-none" type="file"
+                    <input @change="uploadSkin($event, 'skin')" ref="skinUpload" id="skin-upload" class="d-none" type="file"
                            name="file" accept="png">
                 </label>
-                <button @click="removeSkin" type="submit" class="remove-skin-butt" id="removeSkin" title="Удалить скин"
+                <button @click="removeSkin('skin')" type="submit" class="remove-skin-butt" id="removeSkin"
+                        title="Удалить скин"
                         value="">
                     <i class="fa-solid fa-trash-can"></i> Удалить
                 </button>
@@ -28,10 +29,11 @@
             <div class="upload-and-remove-skin column-center" id="cape-url">
                 <label for="cape-upload" class="change-skin-butt">
                     <i class="fa-sharp fa-solid fa-share"></i> Загрузить
-                    <input @change="uploadSkin($event, 'cape')" id="cape-upload" class="d-none" type="file"
+                    <input @change="uploadSkin($event, 'cape')" ref="capeUpload" id="cape-upload" class="d-none" type="file"
                            name="file" accept="png">
                 </label>
-                <button @click="removeSkin" type="submit" class="remove-skin-butt" id="removeCape" title="Удалить скин">
+                <button @click="removeSkin('cape')" type="submit" class="remove-skin-butt" id="removeCape"
+                        title="Удалить скин">
                     <i class="fa-solid fa-trash-can"></i> Удалить
                 </button>
             </div>
@@ -73,6 +75,7 @@ export default {
     },
     methods: {
         uploadSkin(event, type) {
+            console.log('uploadSkin');
             const formData = new FormData();
             const asset = event.target.files[0];
 
@@ -87,23 +90,46 @@ export default {
             axios.post('/cabinet/skin', formData)
                 .then(res => {
                     console.log(res.data);
-                    if (type === 'skin') {
-                        this.skinPath = res.data.skinPath;
-                        this.$refs.skinHead.initializeFaceRender(this.skinPath);
-                    } else if (type === 'cape') {
-                        this.capePath = res.data.capePath;
-                        this.$refs.skinCape.initializeFaceRender(this.capePath);
-                    }
+                    this.updateSkinHeadTexture(type, res.data);
                     this.$refs.skinViewerRef.reloadTexture(formData.get(type), type);
+                })
+        },
+        removeSkin(type) {
+            axios.delete('/cabinet/skin', {
+                data: {type: type}
+            })
+                .then(res => {
+                    console.log(res.data);
+                    this.resetSkinTextureFromInput(type);
+                    this.updateSkinHeadTexture(type, res.data);
+                    this.$nextTick(() => {
+                        this.$refs.skinViewerRef.initializeViewer();
+                    });
                 })
                 .catch(error => {
                     console.log(error);
                 });
         },
-        removeSkin() {
-            //TODO: Implement removeSkin method
+        updateSkinHeadTexture(type, paths) {
+            if (type === 'skin') {
+                this.skinPath = paths.skinPath;
+                this.$refs.skinHead.initializeFaceRender(this.skinPath);
+            } else if (type === 'cape') {
+                this.capePath = paths.capePath;
+                this.$nextTick(() => {
+                    if (this.capePath) {
+                        this.$refs.skinCape.initializeFaceRender(this.capePath);
+                    }
+                });
+            }
         },
-    }
+        resetSkinTextureFromInput(type) {
+            const fileInput = type === 'skin' ? this.$refs.skinUpload : this.$refs.capeUpload;
+            if (fileInput) {
+                fileInput.value = null;
+            }
+        }
+    },
 }
 </script>
 
