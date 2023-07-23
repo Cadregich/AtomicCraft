@@ -59,11 +59,17 @@ export default {
                     indentsAndSize[key] *= sizeMultiplier;
                 }
 
+                // We need to fill the background of the asset with black for transparent skins.
+                ctx.fillStyle = 'black';
+
                 if (type === 'skin') {
                     const imageWidth = canvasWidth - (canvasWidth * (8 / 100));    // To reduce the first layer so that the second is in front
                     const imageHeight = canvasHeight - (canvasHeight * (8 / 100)); // To reduce the first layer so that the second is in front
                     const canvasDX = (canvasWidth - imageWidth) / 2;   // To center the first layer
                     const canvasDY = (canvasHeight - imageHeight) / 2; // To center the first layer
+
+                    ctx.fillRect(canvasDX, canvasDY, imageWidth, imageHeight); //Fill first layer of skin bg`s black
+
                     ctx.drawImage(
                         image,
                         indentsAndSize["FirstLayer"],
@@ -75,6 +81,7 @@ export default {
                         imageWidth,
                         imageHeight
                     );
+
                     ctx.drawImage(
                         image,
                         indentsAndSize["indentXSecondLayer"],
@@ -87,6 +94,9 @@ export default {
                         canvasHeight
                     );
                 } else if (type === 'cape') {
+
+                    ctx.fillRect(0, 0, canvasWidth, canvasHeight); //Fill cape bg`s black
+
                     ctx.drawImage(
                         image,
                         0,
