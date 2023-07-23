@@ -1,5 +1,6 @@
 <template>
     <div class="skin-block">
+        <!-- Change skin block -->
         <div class="skin-butt atomic-block column-center row-gap-2" id="skin-butt-skin">
             <div class="skin-butt-title">Изменить скин</div>
             <template v-if="skinPath">
@@ -18,9 +19,11 @@
                 </button>
             </div>
         </div>
+        <!-- Skin viewer block -->
         <template v-if="skinPath">
             <skinViewer ref="skinViewerRef" :skin-path="skinPath" :cape-path="capePath"></skinViewer>
         </template>
+        <!-- Change cape block -->
         <div class="skin-butt atomic-block column-center row-gap-2" id="skin-butt-cape">
             <div class="skin-butt-title">Изменить плащ</div>
             <template v-if="capePath">
@@ -54,7 +57,8 @@ export default {
     data() {
         return {
             skinPath: '',
-            capePath: ''
+            capePath: '',
+            defaultSkinPath: ''
         }
     },
     computed: {
@@ -68,6 +72,7 @@ export default {
                 console.log(res.data);
                 this.skinPath = res.data.skinPath;
                 this.capePath = res.data.capePath;
+                this.defaultSkinPath = res.data.defaultSkinPath;
             })
             .catch(error => {
                 console.log(error);
@@ -95,6 +100,16 @@ export default {
                 })
         },
         removeSkin(type) {
+            if (type === 'skin') {
+                if (this.skinPath === this.defaultSkinPath) {
+                    return;
+                }
+            } else if (type === 'cape') {
+                if (this.capePath === '') {
+                    return;
+                }
+            }
+
             axios.delete('/cabinet/skin', {
                 data: {type: type}
             })
