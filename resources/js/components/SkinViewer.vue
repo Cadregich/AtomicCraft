@@ -19,15 +19,15 @@ export default {
     name: "SkinViewer",
     props: ['skinPath', 'capePath'],
     mounted() {
-        const availableAnimations = {
-            walk: new skinview3d.WalkingAnimation(),
-            run: new skinview3d.RunningAnimation()
-        };
-
-        this.initializeViewer(availableAnimations);
+        this.initializeViewer();
     },
     methods: {
-        initializeViewer(availableAnimations) {
+        initializeViewer() {
+            const availableAnimations = {
+                walk: new skinview3d.WalkingAnimation(),
+                run: new skinview3d.RunningAnimation()
+            };
+
             skinViewer = new skinview3d.SkinViewer({
                 canvas: document.getElementById("skin_container"),
                 skin: this.skinPath + "?t=" + new Date().getTime(),
@@ -43,6 +43,7 @@ export default {
             skinViewer.controls.enableRotate = true;
             skinViewer.controls.enableZoom = true;
             skinViewer.controls.enablePan = false;
+            console.log(skinViewer);
 
             const animationButtons = document.querySelectorAll('button[name="animation"]');
             animationButtons.forEach(function (button) {
