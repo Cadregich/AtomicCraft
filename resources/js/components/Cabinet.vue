@@ -75,7 +75,6 @@ export default {
     },
     methods: {
         uploadSkin(event, type) {
-            console.log('uploadSkin');
             const formData = new FormData();
             const asset = event.target.files[0];
 
@@ -92,6 +91,7 @@ export default {
                     console.log(res.data);
                     this.updateSkinHeadTexture(type, res.data);
                     this.$refs.skinViewerRef.reloadTexture(formData.get(type), type);
+                    this.resetSkinTextureFromInput(type);
                 })
         },
         removeSkin(type) {
