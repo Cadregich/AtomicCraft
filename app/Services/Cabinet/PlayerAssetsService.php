@@ -50,17 +50,17 @@ class PlayerAssetsService
 
     public function getSkinAndCapePaths($userName): array
     {
-        $skinPath = 'storage/player/defaultSkin.png';
+        $defaultSkinPath = 'storage/player/defaultSkin.png';
         $capePath = '';
         $userSkinPath = 'storage/player/skin/' . $userName . '.png';
         $userCapePath = 'storage/player/cape/' . $userName . '.png';
 
-        if (File::exists($userSkinPath)) {
-            $skinPath = $userSkinPath;
+        if (!File::exists($userSkinPath)) {
+            $userSkinPath = $defaultSkinPath;
         }
         if (File::exists($userCapePath)) {
             $capePath = $userCapePath;
         }
-        return ['skinPath' => $skinPath, 'capePath' => $capePath];
+        return ['skinPath' => $userSkinPath, 'capePath' => $capePath, 'defaultSkinPath' => $defaultSkinPath];
     }
 }
