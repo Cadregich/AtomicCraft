@@ -2,8 +2,7 @@
     <div class="skin">
         <div class="skin-animation-buttons">
             <button id="animation_none" name="animation" value=""><i class="fa-solid fa-person"></i></button>
-            <button id="animation_walk" name="animation" value="walk"><i class="fa-solid fa-walking"></i>
-            </button>
+            <button id="animation_walk" name="animation" value="walk"><i class="fa-solid fa-walking"></i></button>
             <button id="animation_run" name="animation" value="run"><i class="fa-solid fa-running"></i></button>
         </div>
         <canvas id="skin_container" class="d-block"></canvas>
@@ -43,7 +42,6 @@ export default {
             skinViewer.controls.enableRotate = true;
             skinViewer.controls.enableZoom = true;
             skinViewer.controls.enablePan = false;
-            console.log(skinViewer);
 
             const animationButtons = document.querySelectorAll('button[name="animation"]');
             animationButtons.forEach(function (button) {
@@ -57,6 +55,7 @@ export default {
                 });
             });
         },
+
         reloadTexture(input, type) {
             let textureUrl = URL.createObjectURL(input);
             if (type === 'skin') {
