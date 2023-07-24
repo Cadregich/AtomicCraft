@@ -22,18 +22,12 @@ export default {
                 const textureWidth = image.width;
                 const textureHeight = image.height;
 
-                const validWidths = [64, 128, 256, 512, 1024];
-                const validHeights = [32, 64, 128, 256, 512, 1024];
-
-                if (!validWidths.includes(textureWidth) || !validHeights.includes(textureHeight)) {
-                    console.error('Face Render: Invalid texture size');
-                    return;
-                }
-
                 let indentsAndSize = {};
 
                 if (type === 'cape') {
                     indentsAndSize = {
+                        indentX: 0,
+                        indentY: 5,
                         width: 12,
                         height: 8,
                     };
@@ -44,15 +38,6 @@ export default {
                         indentXSecondLayer: 40
                     };
                 }
-
-                /*
-                Calculate Image Size Multiplier Based On Texture Width
-                We need to increase the padding and texture sizes depending on the width of the texture,
-                to correctly display the image on the canvas according to its size.
-                Use base 2 logarithmic operation to determine magnification.
-                Subtract 6 From The Logarithm To Consider That Initially For A 64px Texture
-                the size has been set to 1, and the sizeMultiplier for it will be 1 (2^0 = 1).
-                */
 
                 const sizeMultiplier = 2 ** (Math.log2(textureWidth) - 6);
                 for (let key in indentsAndSize) {
@@ -94,13 +79,23 @@ export default {
                         canvasHeight
                     );
                 } else if (type === 'cape') {
+                    /*
+                     Since there are 22x17 capes that are not divisible by 2, we have to use
+                     this hard method to support such capes manually specifying the desired dimensions.
+                     */
+                    if (textureWidth === 22 && textureHeight === 17) {
+                        indentsAndSize['indentX'] = 2;
+                        indentsAndSize['indentY'] = 5;
+                        indentsAndSize['width'] = 8;
+                        indentsAndSize['height'] = 7;
+                    }
 
                     ctx.fillRect(0, 0, canvasWidth, canvasHeight); //Fill cape bg`s black
 
                     ctx.drawImage(
                         image,
-                        0,
-                        5,
+                        indentsAndSize['indentX'],
+                        indentsAndSize['indentY'],
                         indentsAndSize['width'],
                         indentsAndSize['height'],
                         0,
