@@ -61,11 +61,6 @@ export default {
             defaultSkinPath: ''
         }
     },
-    computed: {
-        userName() {
-            return this.$store.getters.userName;
-        },
-    },
     mounted() {
         axios.get('/cabinet')
             .then(res => {
@@ -83,21 +78,38 @@ export default {
             const formData = new FormData();
             const asset = event.target.files[0];
 
-            if (type === 'skin') {
-                formData.append('skin', asset);
-            } else if (type === 'cape') {
-                formData.append('cape', asset);
-            } else {
-                console.error('Upload asset error: type error');
+            if (!asset) {
+                console.error('Upload asset error: no file selected');
+                return;
             }
 
-            axios.post('/cabinet/skin', formData)
-                .then(res => {
-                    console.log(res.data);
-                    this.updateSkinHeadTexture(type, res.data);
-                    this.$refs.skinViewerRef.reloadTexture(formData.get(type), type);
-                    this.resetSkinTextureFromInput(type);
-                })
+            this.getDimensionsFromImage(asset, (width, height) => {
+                const validSkinSizes = [32 ,64, 128, 256, 512, 1024];
+                const validCapeSizes = [16, 32, 64, 128, 512];
+                if (!this.isValidSkinSize(width, height, type, validSkinSizes, validCapeSizes)) {
+                    console.error('Invalid ' + type + ' size');
+                    return;
+                }
+
+                if (type === 'skin') {
+                    formData.append('skin', asset);
+                } else if (type === 'cape') {
+                    formData.append('cape', asset);
+                } else {
+                    console.error('Upload asset error: type error');
+                }
+
+                axios.post('/cabinet/skin', formData)
+                    .then(res => {
+                        console.log(res.data);
+                        this.updateSkinHeadTexture(type, res.data);
+                        this.$refs.skinViewerRef.reloadTexture(formData.get(type), type);
+                        this.resetSkinTextureFromInput(type);
+                    })
+                    .catch(error => {
+                        console.error('Error uploading asset:', error);
+                    });
+            });
         },
         removeSkin(type) {
             if (type === 'skin') {
@@ -124,6 +136,39 @@ export default {
                 .catch(error => {
                     console.log(error);
                 });
+        },
+        getDimensionsFromImage(file, callback) {
+            const reader = new FileReader();
+
+            reader.onload = (e) => {
+                const img = new Image();
+                img.src = e.target.result;
+
+                img.onload = () => {
+                    const width = img.width;
+                    const height = img.height;
+                    callback(width, height);
+                };
+            };
+
+            reader.readAsDataURL(file);
+        },
+        isValidSkinSize(width, height, type, validSkinSizes, validCapeSizes) {
+            const additionalCapeSizes = {'width': 22, 'height': 17};
+            let isSkinWidthValid;
+            let isSkinHeightValid;
+            if (type === 'skin') {
+                isSkinWidthValid = validSkinSizes.includes(width);
+                isSkinHeightValid = height === width || height === width / 2;
+            } else if (type === 'cape') {
+                isSkinWidthValid = validCapeSizes.includes(width);
+                isSkinHeightValid = height === width / 2;
+                if (!isSkinWidthValid || !isSkinHeightValid) {
+                    isSkinWidthValid = width === additionalCapeSizes.width;
+                    isSkinHeightValid = height === additionalCapeSizes.height;
+                }
+            }
+            return isSkinWidthValid && isSkinHeightValid;
         },
         updateSkinHeadTexture(type, paths) {
             if (type === 'skin') {
