@@ -31,15 +31,6 @@ export default {
             showFooter: false
         }
     },
-    methods: {
-        openModal() {
-            this.modal.show();
-        },
-
-        closeModal() {
-            this.modal.hide();
-        }
-    },
     computed: {
         modal() {
             return new Modal(document.getElementById(this.id));

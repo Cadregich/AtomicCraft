@@ -72,6 +72,7 @@ const store = new Vuex.Store({
 
         closeModal(context) {
             context.state.modal.hide();
+            context.state.modal = null;
         },
     },
     getters: {
