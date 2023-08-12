@@ -9,7 +9,8 @@
             <div class="upload-and-remove-skin column-center">
                 <label for="skin-upload" class="change-skin-butt">
                     <i class="fa-sharp fa-solid fa-share"></i> Загрузить
-                    <input @change="uploadSkin($event, 'skin')" ref="skinUpload" id="skin-upload" class="d-none" type="file"
+                    <input @change="uploadSkin($event, 'skin')" ref="skinUpload" id="skin-upload" class="d-none"
+                           type="file"
                            name="file" accept="png">
                 </label>
                 <button @click="removeSkin('skin')" type="submit" class="remove-skin-butt" id="removeSkin"
@@ -32,7 +33,8 @@
             <div class="upload-and-remove-skin column-center" id="cape-url">
                 <label for="cape-upload" class="change-skin-butt">
                     <i class="fa-sharp fa-solid fa-share"></i> Загрузить
-                    <input @change="uploadSkin($event, 'cape')" ref="capeUpload" id="cape-upload" class="d-none" type="file"
+                    <input @change="uploadSkin($event, 'cape')" ref="capeUpload" id="cape-upload" class="d-none"
+                           type="file"
                            name="file" accept="png">
                 </label>
                 <button @click="removeSkin('cape')" type="submit" class="remove-skin-butt" id="removeCape"
@@ -47,18 +49,22 @@
 <script>
 import skinViewer from "./SkinViewer.vue";
 import skinHead from "./SkinHead.vue";
+import {Notification} from '../notifications.js';
 
 export default {
     name: "Cabinet",
     components: {
-        SkinViewer: skinViewer,
-        skinHead
+        skinViewer,
+        skinHead,
     },
     data() {
         return {
             skinPath: '',
             capePath: '',
-            defaultSkinPath: ''
+            defaultSkinPath: '',
+            uploadErrorInfo: {
+                validSkinSizes: ''
+            }
         }
     },
     mounted() {
@@ -78,53 +84,38 @@ export default {
             const formData = new FormData();
             const asset = event.target.files[0];
 
-            if (!asset) {
-                console.error('Upload asset error: no file selected');
+            try {
+                this.validateUploadingAsset(asset);
+            } catch (error) {
+                this.resetSkinTextureFromInput(type);
+                console.error(error);
                 return;
             }
 
-            this.getDimensionsFromImage(asset, (width, height) => {
-                const validSkinSizes = [32 ,64, 128, 256, 512, 1024];
-                const validCapeSizes = [16, 32, 64, 128, 512];
-                if (!this.isValidSkinSize(width, height, type, validSkinSizes, validCapeSizes)) {
-                    console.error('Invalid ' + type + ' size');
-                    return;
-                }
+            formData.append('type', type);
+            formData.append('file', asset);
 
-                if (type === 'skin') {
-                    formData.append('skin', asset);
-                } else if (type === 'cape') {
-                    formData.append('cape', asset);
-                } else {
-                    console.error('Upload asset error: type error');
-                }
-
-                axios.post('/cabinet/skin', formData)
-                    .then(res => {
-                        console.log(res.data);
-                        this.updateSkinHeadTexture(type, res.data);
-                        this.$refs.skinViewerRef.reloadTexture(formData.get(type), type);
-                        this.resetSkinTextureFromInput(type);
-                    })
-                    .catch(error => {
-                        console.error('Error uploading asset:', error);
-                    });
-            });
+            axios.post('/cabinet/skin', formData)
+                .then(res => {
+                    console.log(res.data);
+                    this.updateSkinHeadTexture(type, res.data);
+                    this.$refs.skinViewerRef.reloadTexture(formData.get('file'), type);
+                })
+                .catch(error => {
+                    Notification.error(`Ошибка загрузки: Неверный размер ${type === 'skin' ? 'cкина' : (type === 'cape' ? 'плаща' : '')};
+                    Допустимые размеры: ${error.response.data.validSizes}`);
+                });
+            this.resetSkinTextureFromInput(type);
         },
+
         removeSkin(type) {
-            if (type === 'skin') {
-                if (this.skinPath === this.defaultSkinPath) {
-                    return;
-                }
-            } else if (type === 'cape') {
-                if (this.capePath === '') {
-                    return;
-                }
+            if (type === 'skin' && this.skinPath === this.defaultSkinPath) {
+                return;
+            } else if (type === 'cape' && this.capePath === '') {
+                return;
             }
 
-            axios.delete('/cabinet/skin', {
-                data: {type: type}
-            })
+            axios.delete('/cabinet/skin', {data: {type: type}})
                 .then(res => {
                     console.log(res.data);
                     this.resetSkinTextureFromInput(type);
@@ -137,39 +128,7 @@ export default {
                     console.log(error);
                 });
         },
-        getDimensionsFromImage(file, callback) {
-            const reader = new FileReader();
 
-            reader.onload = (e) => {
-                const img = new Image();
-                img.src = e.target.result;
-
-                img.onload = () => {
-                    const width = img.width;
-                    const height = img.height;
-                    callback(width, height);
-                };
-            };
-
-            reader.readAsDataURL(file);
-        },
-        isValidSkinSize(width, height, type, validSkinSizes, validCapeSizes) {
-            const additionalCapeSizes = {'width': 22, 'height': 17};
-            let isSkinWidthValid;
-            let isSkinHeightValid;
-            if (type === 'skin') {
-                isSkinWidthValid = validSkinSizes.includes(width);
-                isSkinHeightValid = height === width || height === width / 2;
-            } else if (type === 'cape') {
-                isSkinWidthValid = validCapeSizes.includes(width);
-                isSkinHeightValid = height === width / 2;
-                if (!isSkinWidthValid || !isSkinHeightValid) {
-                    isSkinWidthValid = width === additionalCapeSizes.width;
-                    isSkinHeightValid = height === additionalCapeSizes.height;
-                }
-            }
-            return isSkinWidthValid && isSkinHeightValid;
-        },
         updateSkinHeadTexture(type, paths) {
             if (type === 'skin') {
                 this.skinPath = paths.skinPath;
@@ -183,10 +142,22 @@ export default {
                 });
             }
         },
+
         resetSkinTextureFromInput(type) {
             const fileInput = type === 'skin' ? this.$refs.skinUpload : this.$refs.capeUpload;
             if (fileInput) {
                 fileInput.value = null;
+            }
+        },
+
+        validateUploadingAsset(asset) {
+            if (!asset) {
+                throw new Error('Upload asset error: no file selected');
+            }
+
+            if (asset.size > 500 * 1024) {
+                Notification.error('Ошибка: Файл слишком тяжёлый');
+                throw new Error('Upload asset error: file is too heavy');
             }
         }
     },

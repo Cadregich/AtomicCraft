@@ -8,10 +8,12 @@ use Illuminate\Http\Request;
 
 class PlayerAssetsController extends Controller
 {
-    protected $userAssets;
+    protected PlayerAssetsService $userAssets;
+    public string $type;
 
-    public function __construct(PlayerAssetsService $userAssets)
+    public function __construct(Request $request, PlayerAssetsService $userAssets)
     {
+        $this->type = $request->input('type');
         $this->userAssets = $userAssets;
     }
 
@@ -21,14 +23,18 @@ class PlayerAssetsController extends Controller
      * @returns bool | string
      */
 
-    public function upload(Request $request)
+    public function upload(Request $request): array|\Illuminate\Http\JsonResponse
     {
         $userName = $request->user()->name;
+        $asset = $request->file('file');
+
         try {
-            $this->userAssets->upload($request, $userName);
+            $this->userAssets->upload($asset, $this->type, $userName);
             return $this->userAssets->getSkinAndCapePaths($userName);
         } catch (\Exception $e) {
-            return 'Asset upload error ' . $e;
+            return response()->json(['error' => 'Asset upload error: ' . $e->getMessage(),
+                'validSizes' => $this->userAssets->getAllValidSkinSizes($this->type)
+            ], 413);
         }
     }
 
@@ -38,14 +44,14 @@ class PlayerAssetsController extends Controller
      * @returns bool | string
      */
 
-    public function reset(Request $request)
+    public function reset(Request $request): array|string
     {
         $userName = $request->user()->name;
-        $type = $request->input('type');
         $currentSkinPath = 'storage/player/skin/' . $userName . '.png';
         $capePath = 'storage/player/cape/' . $userName . '.png';
+        $filePath = ($this->type === 'skin') ? $currentSkinPath : $capePath;
         try {
-            $this->userAssets->remove($type, $currentSkinPath, $capePath);
+            $this->userAssets->remove($this->type, $filePath);
             return $this->userAssets->getSkinAndCapePaths($userName);
         } catch (\Exception $e) {
             return 'Asset reset error ' . $e;
