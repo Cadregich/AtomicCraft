@@ -1,12 +1,4 @@
 <template>
-    <info-modal>
-        <template v-slot:modalHeader>
-            {{ errorTextHeader }}
-        </template>
-        <template v-slot:modalBody>
-            {{ errorTextBody }}
-        </template>
-    </info-modal>
     <div class="skin-block">
         <!-- Change skin block -->
         <div class="skin-butt atomic-block column-center row-gap-2" id="skin-butt-skin">
@@ -57,14 +49,13 @@
 <script>
 import skinViewer from "./SkinViewer.vue";
 import skinHead from "./SkinHead.vue";
-import infoModal from "./InfoModal.vue";
+import {Notification} from '../notifications.js';
 
 export default {
     name: "Cabinet",
     components: {
         skinViewer,
         skinHead,
-        infoModal
     },
     data() {
         return {
@@ -72,25 +63,9 @@ export default {
             capePath: '',
             defaultSkinPath: '',
             uploadErrorInfo: {
-                errorType: '',
-                uploadType: '',
                 validSkinSizes: ''
             }
         }
-    },
-    computed: {
-        errorTextHeader() {
-            return `Ошибка загрузки ${this.uploadErrorInfo.uploadType === 'skin' ? 'cкина' : (this.uploadErrorInfo.uploadType === 'cape' ? 'плаща' : '')}`;
-        },
-        errorTextBody() {
-            if (this.uploadErrorInfo.errorType === 'file is too heavy') {
-                return `Файл слишком тяжёлый`;
-            } else if (this.uploadErrorInfo.errorType === 'invalid file side size') {
-                return `Допустимые размеры ${ this.uploadErrorInfo.uploadType === 'skin' ? 'cкина' :
-                    (this.uploadErrorInfo.uploadType === 'cape' ? 'плаща' : '')}:
-                    ${ this.uploadErrorInfo.validSkinSizes }`;
-            }
-        },
     },
     mounted() {
         axios.get('/cabinet')
@@ -109,18 +84,11 @@ export default {
             const formData = new FormData();
             const asset = event.target.files[0];
 
-            if (!asset) {
-                console.error('Upload asset error: no file selected');
-                return;
-            }
-
-            // If file size more than 500 kilobytes display error
-            if (asset.size > 500 * 1024) {
-                this.uploadErrorInfo.uploadType = type;
-                this.uploadErrorInfo.errorType = 'file is too heavy';
-                this.$store.dispatch('openModal', 'info-modal');
-                console.error('Upload asset error: file is too heavy');
+            try {
+                this.validateUploadingAsset(asset);
+            } catch (error) {
                 this.resetSkinTextureFromInput(type);
+                console.error(error);
                 return;
             }
 
@@ -134,14 +102,12 @@ export default {
                     this.$refs.skinViewerRef.reloadTexture(formData.get('file'), type);
                 })
                 .catch(error => {
-                    console.error(error);
-                    this.uploadErrorInfo.uploadType = type;
-                    this.uploadErrorInfo.errorType = 'invalid file side size';
-                    this.uploadErrorInfo.validSkinSizes = error.response.data.validSizes;
-                    this.$store.dispatch('openModal', 'info-modal');
+                    Notification.error(`Ошибка загрузки: Неверный размер ${type === 'skin' ? 'cкина' : (type === 'cape' ? 'плаща' : '')};
+                    Допустимые размеры: ${error.response.data.validSizes}`);
                 });
             this.resetSkinTextureFromInput(type);
         },
+
         removeSkin(type) {
             if (type === 'skin' && this.skinPath === this.defaultSkinPath) {
                 return;
@@ -149,9 +115,7 @@ export default {
                 return;
             }
 
-            axios.delete('/cabinet/skin', {
-                data: {type: type}
-            })
+            axios.delete('/cabinet/skin', {data: {type: type}})
                 .then(res => {
                     console.log(res.data);
                     this.resetSkinTextureFromInput(type);
@@ -164,6 +128,7 @@ export default {
                     console.log(error);
                 });
         },
+
         updateSkinHeadTexture(type, paths) {
             if (type === 'skin') {
                 this.skinPath = paths.skinPath;
@@ -177,6 +142,7 @@ export default {
                 });
             }
         },
+
         resetSkinTextureFromInput(type) {
             const fileInput = type === 'skin' ? this.$refs.skinUpload : this.$refs.capeUpload;
             if (fileInput) {
@@ -184,6 +150,16 @@ export default {
             }
         },
 
+        validateUploadingAsset(asset) {
+            if (!asset) {
+                throw new Error('Upload asset error: no file selected');
+            }
+
+            if (asset.size > 500 * 1024) {
+                Notification.error('Ошибка: Файл слишком тяжёлый');
+                throw new Error('Upload asset error: file is too heavy');
+            }
+        }
     },
 }
 </script>
