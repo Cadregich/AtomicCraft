@@ -64,7 +64,68 @@
                 </tbody>
             </table>
         </div>
+
         <SkinBlock></SkinBlock>
+
+        <div class="balance-block atomic-block column-center">
+            <h4><i class="cabinet-block-title-icon fa-solid fa-money-check-dollar"></i>Баланс</h4>
+            <div class="deposit-bonus d-flex column-gap-3">
+                <i>От:</i>
+                <div>100 <i class="fa-solid fa-coins"></i> + 5%</div>
+                <div>200 <i class="fa-solid fa-coins"></i> + 10%</div>
+                <div>500 <i class="fa-solid fa-coins"></i> + 30%</div>
+            </div>
+            <label class="w-100 d-flex justify-content-center">
+                <input class="atomic-input w-75 mt-3" type="text">
+            </label>
+            <button class="atomic-butt1 mt-3">Пополнить</button>
+            <div class="deposit-final-sum mt-2">
+                Вам начислиться <span style="font-size: 18px">500 </span><i class="fa-solid fa-coins"></i></div>
+        </div>
+
+        <div class="privileges-block atomic-block column-center">
+            <h4><i class="cabinet-block-title-icon fa-solid fa-shopping-basket"></i>Привилегии</h4>
+            <div class="privileges mt-2">
+                <template v-for="i in 6">
+                <div class="privilege-tile column-center">
+                    <b>Vip</b>
+                    <div>100 <i class="fa-solid fa-coins"></i></div>
+                    <button class="atomic-butt1 mt-2">Купить</button>
+                </div>
+                </template>
+            </div>
+        </div>
+
+        <div class="daily-gift-block atomic-block column-center">
+            <h4>Подарок за ежедневный вход</h4>
+            <form action="" method="post">
+                <button class="bg-none bg-transparent border-0" type="submit">
+                    <i class="gift mt-3 fa-solid fa-gift"></i>
+                </button>
+            </form>
+
+            <span class="mt-3">Вы получаете подарок <span class="text-info fst-italic">5</span> суток подряд</span>
+            <span class="">
+                Сегодня вы можете получить <span class="text-info">Слиток железа </span>
+                <span class="fst-italic"> х30</span>
+            </span>
+        </div>
+        <div class="ref-and-promo-block">
+            <div class="promo-block atomic-block w-100 column-center">
+                <h4><i class="cabinet-block-title-icon fa-solid fa-keyboard"></i>Ввести промокод</h4>
+                <label class="w-100">
+                    <input class="atomic-input w-100 mt-2" type="text">
+                </label>
+                <div class="w-100 mt-1">
+                    <a class="text-white" href="">Где взять промокод?</a>
+                </div>
+
+            </div>
+            <div class="ref-block atomic-block w-100 mt-3 column-center">
+                <b>Рефералка</b>
+                <b class="mt-2">В разработке</b>
+            </div>
+        </div>
     </div>
 
 </template>
