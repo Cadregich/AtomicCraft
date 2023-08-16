@@ -164,7 +164,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 .skin-block {
     display: flex;
     align-items: start;
