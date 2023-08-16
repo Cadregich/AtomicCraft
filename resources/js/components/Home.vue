@@ -61,13 +61,6 @@
 <script>
 export default {
     name: "Home",
-    mounted() {
-        window.addEventListener('resize', function () {
-            let screenWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-            console.log('Текущая ширина экрана: ' + screenWidth + ' пикселей');
-        });
-
-    }
 }
 </script>
 
