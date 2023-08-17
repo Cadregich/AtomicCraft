@@ -7,19 +7,19 @@
                 <tbody>
                 <tr>
                     <td>Почта</td>
-                    <td class="text-break">thekeykeyloy@gmail.com</td>
+                    <td class="text-break">{{ userInfo.userEmail }}</td>
                 </tr>
                 <tr>
                     <td>Дата регистрации</td>
-                    <td>24.11.2004</td>
+                    <td>{{ userInfo.registrationDate }}</td>
                 </tr>
                 <tr>
                     <td>Последний вход в игру</td>
-                    <td>11.24.2022</td>
+                    <td>{{ userInfo.lastGameLoginDate }}</td>
                 </tr>
                 <tr>
                     <td>Статус</td>
-                    <td>Игрок</td>
+                    <td>{{ userInfo.privilegeTitle }}</td>
                 </tr>
                 <tr>
                     <td class="text-center text-info" colspan="2">Возможности</td>
@@ -27,38 +27,37 @@
                 <tr>
                     <td>Смена ника</td>
                     <td>
-                        <!--                    @if($capabilitiesFromTotalDonate['nickChange'])
-                                            <i class="fa-solid fa-check"></i>
-                                            @else
-                                            <i class="fa-solid fa-xmark"></i>
-                                            <a class="how-get" title="Необходимо 1 раз пополнить баланс от 100 монет">?</a>
-                                            @endif-->
-                        <i class="fa-solid fa-check"></i>
+                        <template v-if="userInfo.capabilitiesFromTotalDonate.nickChange">
+                            <i class="fa-solid fa-check"></i>
+                        </template>
+                        <template v-else>
+                            <i class="fa-solid fa-xmark"></i>
+                            <a class="how-get" title="Необходимо за 1 раз пополнить баланс от 100 монет">?</a>
+                        </template>
                     </td>
                 </tr>
                 <tr>
                     <td>Загружать плащи</td>
                     <td>
-                        <!--                    @if($capabilitiesFromTotalDonate['skinAndCapeChange'])-->
-                        <!--                    <i class="fa-solid fa-check"></i>-->
-                        <!--                    @else-->
-                        <!--                    <i class="fa-solid fa-xmark"></i>-->
-                        <!--                    <a class="how-get" title="Необходимо 1 раз пополнить баланс от 250 монет">?</a>-->
-                        <!--                    @endif-->
-                        <i class="fa-solid fa-check"></i>
+                        <template v-if="userInfo.capabilitiesFromTotalDonate.capeChange">
+                            <i class="fa-solid fa-check"></i>
+                        </template>
+                        <template v-else>
+                            <i class="fa-solid fa-xmark"></i>
+                            <a class="how-get" title="Необходимо за 1 раз пополнить баланс от 250 монет">?</a>
+                        </template>
                     </td>
                 </tr>
                 <tr>
                     <td>Загружать hd скины</td>
                     <td>
-                        <!--                    @if($capabilitiesFromTotalDonate['hdSkinsAndCapeUpload'])-->
-                        <!--                    <i class="fa-solid fa-check"></i>-->
-                        <!--                    @else-->
-                        <!--                    <i class="fa-solid fa-xmark"></i>-->
-                        <!--                    <a class="how-get" title="Необходимо 1 раз пополнить баланс от 400 монет">?</a>-->
-                        <!--                    @endif-->
-                        <i class="fa-solid fa-xmark"></i>
-                        <a class="how-get" title="Необходимо 1 раз пополнить баланс от 400 монет">?</a>
+                        <template v-if="userInfo.capabilitiesFromTotalDonate.hdSkinsAndCapeUpload">
+                            <i class="fa-solid fa-check"></i>
+                        </template>
+                        <template v-else>
+                            <i class="fa-solid fa-xmark"></i>
+                            <a class="how-get" title="Необходимо за 1 раз пополнить баланс от 400 монет">?</a>
+                        </template>
                     </td>
                 </tr>
                 </tbody>
@@ -138,6 +137,21 @@ export default {
         SkinBlock
     },
     name: "Cabinet",
+    data() {
+        return {
+            userInfo: []
+        }
+    },
+    created() {
+        axios.get('/cabinet/user-info')
+            .then(res => {
+                console.log(res.data);
+                this.userInfo = res.data;
+            })
+            .catch(error => {
+                console.log(error);
+            })
+    }
 }
 </script>
 

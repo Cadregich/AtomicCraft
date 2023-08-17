@@ -32,6 +32,7 @@ Route::namespace('App\Http\Controllers')->group(function () {
 
     Route::middleware('auth:sanctum')->prefix('cabinet')->namespace('Cabinet')->group(function () {
         Route::get('/', 'CabinetController');
+        Route::get('/user-info', 'CabinetController@getUserInfo');
         Route::post('/skin', 'PlayerAssetsController@upload');
         Route::delete('/skin', 'PlayerAssetsController@reset');
         Route::post('/check-daily-gift', 'DailyGiftController');
