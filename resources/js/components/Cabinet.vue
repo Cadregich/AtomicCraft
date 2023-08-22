@@ -172,6 +172,9 @@ export default {
                 console.log(error);
             });
     },
+    mounted() {
+        this.getCommonCurrencyMultiplier();
+    },
     methods: {
         getCommonCurrencyMultiplier() {
             axios.get('/cabinet/common-currency-multiplier', { params: { currency: this.depositSelectedCurrency } })
