@@ -27,7 +27,7 @@
                 <tr>
                     <td>Смена ника</td>
                     <td>
-                        <template v-if="userInfo.capabilitiesFromTotalDonate.nickChange">
+                        <template v-if="userInfo.capabilitiesFromTotalDonate.nickChange ">
                             <i class="fa-solid fa-check"></i>
                         </template>
                         <template v-else>
@@ -74,23 +74,34 @@
                 <div>200 <i class="fa-solid fa-coins"></i> + 10%</div>
                 <div>500 <i class="fa-solid fa-coins"></i> + 30%</div>
             </div>
-            <label class="w-100 d-flex justify-content-center">
-                <input class="atomic-input w-75 mt-3" type="text">
-            </label>
-            <button class="atomic-butt1 mt-3">Пополнить</button>
-            <div class="deposit-final-sum mt-2">
-                Вам начислиться <span style="font-size: 18px">500 </span><i class="fa-solid fa-coins"></i></div>
+            <div class="container mt-3">
+                <form class="w-100 d-flex flex-column align-items-center" id="depositForm" @submit.prevent="depositSubmit">
+                    <label for="deposit-input">Введите сумму для пополнения баланса</label>
+                    <div class="d-flex mt-1">
+                        <input v-model="depositValue" @input="handleDepositValue" id="deposit-input" class="atomic-input" type="number" placeholder="" name="value">
+                        <select v-model="depositSelectedCurrency" @change="getCommonCurrencyMultiplier()" id="deposit-select-currency" class="atomic-input" aria-label="Выберите валюту" name="currency">
+                            <option value="UAH">&#8372; UAH</option>
+                            <option value="RUB">&#8381; RUB</option>
+                            <option value="USD">&#36; USD</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <button class="atomic-butt1 mt-3" type="submit" form="depositForm">Пополнить</button>
+            <div class="deposit-final-sum mt-2" v-if="depositValue">
+                Вам начислиться: <span class="nobr"><span style="font-size: 18px">{{ formattedTotalCoins }} </span> <i class="fa-solid fa-coins"></i></span>
+            </div>
         </div>
 
         <div class="privileges-block atomic-block column-center">
             <h4><i class="cabinet-block-title-icon fa-solid fa-shopping-basket"></i>Привилегии</h4>
             <div class="privileges mt-2">
                 <template v-for="i in 6">
-                <div class="privilege-tile column-center">
-                    <b>Vip</b>
-                    <div>100 <i class="fa-solid fa-coins"></i></div>
-                    <button class="atomic-butt1 mt-2">Купить</button>
-                </div>
+                    <div class="privilege-tile column-center">
+                        <b>Vip</b>
+                        <div>100 <i class="fa-solid fa-coins"></i></div>
+                        <button class="atomic-butt1 mt-2">Купить</button>
+                    </div>
                 </template>
             </div>
         </div>
@@ -126,11 +137,11 @@
             </div>
         </div>
     </div>
-
 </template>
 
 <script>
 import SkinBlock from "./SkinBlock.vue";
+import numeral from 'numeral';
 
 export default {
     components: {
@@ -139,7 +150,16 @@ export default {
     name: "Cabinet",
     data() {
         return {
-            userInfo: []
+            userInfo: [],
+            depositValue: '',
+            depositSelectedCurrency: 'UAH',
+            currencyMultiplier: 0,
+            totalCoins: 0,
+        }
+    },
+    computed: {
+        formattedTotalCoins() {
+            return numeral(this.totalCoins).format('0,0.00');
         }
     },
     created() {
@@ -150,13 +170,35 @@ export default {
             })
             .catch(error => {
                 console.log(error);
-            })
+            });
+    },
+    methods: {
+        getCommonCurrencyMultiplier() {
+            axios.get('/cabinet/common-currency-multiplier', { params: { currency: this.depositSelectedCurrency } })
+                .then(res => {
+                    this.currencyMultiplier = res.data;
+                    this.calculateTotalCoins();
+                });
+        },
+        handleDepositValue() {
+            if (this.depositValue < 0) {
+                this.depositValue = 0;
+            }
+            this.calculateTotalCoins();
+        },
+        depositSubmit() {
+            alert(this.totalCoins);
+        },
+        calculateTotalCoins() {
+            this.totalCoins = (this.depositValue * this.currencyMultiplier).toFixed(2);
+        }
     }
 }
 </script>
 
 <style>
 @import url('/resources/css/cabinet-grid.css');
+
 .cabinet-block-title-icon {
     margin-right: 10px;
     font-size: 20px;
@@ -194,7 +236,19 @@ export default {
 }
 
 .balance-block {
+    width: 430px;
+}
 
+#deposit-input {
+    border-radius: 5px 0 0 5px;
+}
+
+#deposit-select-currency {
+    border-radius: 0 5px 5px 0;
+}
+
+#deposit-select-currency > option {
+    color: black;
 }
 
 .deposit-bonus {

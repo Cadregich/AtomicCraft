@@ -7,7 +7,6 @@ use App\Services\Cabinet\UserDataService;
 use App\Services\Cabinet\PlayerAssetsService;
 use App\Services\PaymentService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\File;
 
 class CabinetController extends Controller
 {
@@ -42,6 +41,16 @@ class CabinetController extends Controller
         return compact('userName', 'userEmail', 'privilegeTitle', 'lastGameLoginDate', 'capabilitiesFromTotalDonate', 'registrationDate');
     }
 
+    /**
+     * Gets common currency multiplier to convert to coins.
+     * Needed for the client to convert currency to coins.
+     */
+
+    public function getCommonCurrencyMultiplier(Request $request)
+    {
+        $currency = $request->input('currency');
+        return $this->paymentService->currencyToCoins(1, $currency);
+    }
 
     private function getCapabilitiesFromAllDonates($userId): array
     {
@@ -50,7 +59,8 @@ class CabinetController extends Controller
         return $this->userDataService->getCapabilitiesFromTotalDonate($totalDonates);
     }
 
-    private function getTotalDonateInCoins($allDonates) {
+    private function getTotalDonateInCoins($allDonates)
+    {
         $totalDonate = 0;
 
         foreach ($allDonates as $donate) {

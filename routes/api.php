@@ -35,9 +35,11 @@ Route::namespace('App\Http\Controllers')->group(function () {
         Route::get('/user-info', 'CabinetController@getUserInfo');
         Route::post('/skin', 'PlayerAssetsController@upload');
         Route::delete('/skin', 'PlayerAssetsController@reset');
+        Route::get('/common-currency-multiplier', 'CabinetController@getCommonCurrencyMultiplier');
         Route::post('/check-daily-gift', 'DailyGiftController');
         Route::get('/assetPaths', 'CabinetController@getSkinAndCapePaths');
     });
+
     Route::prefix('shop')->namespace('Shop')->group(function () {
         Route::get('/goods-mods', function () {
             return Mod::orderBy('title', 'asc')->pluck('title');
