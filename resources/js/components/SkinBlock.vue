@@ -52,7 +52,7 @@ import skinHead from "./SkinHead.vue";
 import {Notification} from '../notifications.js';
 
 export default {
-    name: "Cabinet",
+    name: "SkinBlock",
     components: {
         skinViewer,
         skinHead,

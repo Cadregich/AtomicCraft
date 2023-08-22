@@ -22,8 +22,10 @@ axios.interceptors.response.use(response => {
     });
 
 axios.interceptors.request.use(config => {
-    // Добавляем '/api' к началу URL
-    config.url = '/api' + config.url;
+    // Добавляем '/api' к началу URL, если config.url не начинается с '/'
+    if (config.url.startsWith('/')) {
+        config.url = '/api' + config.url;
+    }
     return config;
 }, error => {
     return Promise.reject(error);
