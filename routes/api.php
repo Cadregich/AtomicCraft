@@ -32,12 +32,35 @@ Route::namespace('App\Http\Controllers')->group(function () {
 
     Route::middleware('auth:sanctum')->prefix('cabinet')->namespace('Cabinet')->group(function () {
         Route::get('/', 'CabinetController');
+        Route::post('/pay', 'CabinetController@pay');
         Route::get('/user-info', 'CabinetController@getUserInfo');
         Route::post('/skin', 'PlayerAssetsController@upload');
         Route::delete('/skin', 'PlayerAssetsController@reset');
         Route::get('/common-currency-multiplier', 'CabinetController@getCommonCurrencyMultiplier');
         Route::post('/check-daily-gift', 'DailyGiftController');
         Route::get('/assetPaths', 'CabinetController@getSkinAndCapePaths');
+    });
+
+    Route::post('/payment-finished', function (Request $request) {
+        $filePath = storage_path('app/data.json');
+
+        file_put_contents($filePath, 'dasdasdasdas');
+        \App\Models\Payment::create([
+            'user_id' => 1,
+            'amount' => 23,
+            'currency' => 'USD',
+            'payment_system' => 'liqpay',
+            'payment_id' => 'asdsasdfkfdsp'
+        ]);
+            $data = $request->all();
+            $jsonData = json_encode($data, JSON_PRETTY_PRINT);
+
+            // Укажите путь к файлу, в который хотите записать данные
+            $filePath = storage_path('app/data.json');
+
+            file_put_contents($filePath, $jsonData);
+
+            return redirect('http://atomiccraft');
     });
 
     Route::prefix('shop')->namespace('Shop')->group(function () {
