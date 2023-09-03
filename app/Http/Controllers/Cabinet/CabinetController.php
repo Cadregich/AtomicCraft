@@ -5,7 +5,8 @@ namespace App\Http\Controllers\Cabinet;
 use App\Http\Controllers\Controller;
 use App\Services\Cabinet\UserDataService;
 use App\Services\Cabinet\PlayerAssetsService;
-use App\Services\PaymentService;
+use App\Services\Coins;
+use App\Services\Payment;
 use Illuminate\Http\Request;
 
 class CabinetController extends Controller
@@ -15,7 +16,7 @@ class CabinetController extends Controller
     protected $paymentService;
     protected $playerAssets;
 
-    public function __construct(PlayerAssetsService $playerAssetsService, UserDataService $userDataService, PaymentService $paymentService)
+    public function __construct(PlayerAssetsService $playerAssetsService, UserDataService $userDataService, Coins $paymentService)
     {
         $this->userDataService = $userDataService;
         $this->paymentService = $paymentService;
@@ -26,6 +27,14 @@ class CabinetController extends Controller
     {
         $userName = $request->user()->name;
         return $this->playerAssets->getSkinAndCapePaths($userName);
+    }
+
+    public function pay(Request $request)
+    {
+        $amount = $request->input('amount');
+        $currency = $request->input('currency');
+        $payment = new Payment($amount, $currency);
+        return $payment->LiqPay();
     }
 
     public function getUserInfo(Request $request): array

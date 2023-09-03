@@ -75,11 +75,15 @@
                 <div>500 <i class="fa-solid fa-coins"></i> + 30%</div>
             </div>
             <div class="container mt-3">
-                <form class="w-100 d-flex flex-column align-items-center" id="depositForm" @submit.prevent="depositSubmit">
+                <form class="w-100 d-flex flex-column align-items-center" id="depositForm"
+                      @submit.prevent="depositSubmit">
                     <label for="deposit-input">Введите сумму для пополнения баланса</label>
                     <div class="d-flex mt-1">
-                        <input v-model="depositValue" @input="handleDepositValue" id="deposit-input" class="atomic-input" type="number" placeholder="" name="value">
-                        <select v-model="depositSelectedCurrency" @change="getCommonCurrencyMultiplier()" id="deposit-select-currency" class="atomic-input" aria-label="Выберите валюту" name="currency">
+                        <input v-model="depositValue" @input="handleDepositValue" id="deposit-input"
+                               class="atomic-input" type="number" placeholder="" name="value">
+                        <select v-model="depositSelectedCurrency" @change="getCommonCurrencyMultiplier()"
+                                id="deposit-select-currency" class="atomic-input" aria-label="Выберите валюту"
+                                name="currency">
                             <option value="UAH">&#8372; UAH</option>
                             <option value="RUB">&#8381; RUB</option>
                             <option value="USD">&#36; USD</option>
@@ -89,7 +93,8 @@
             </div>
             <button class="atomic-butt1 mt-3" type="submit" form="depositForm">Пополнить</button>
             <div class="deposit-final-sum mt-2" v-if="depositValue">
-                Вам начислиться: <span class="nobr"><span style="font-size: 18px">{{ formattedTotalCoins }} </span> <i class="fa-solid fa-coins"></i></span>
+                Вам начислиться: <span class="nobr"><span style="font-size: 18px">{{ formattedTotalCoins }} </span> <i
+                class="fa-solid fa-coins"></i></span>
             </div>
         </div>
 
@@ -151,6 +156,11 @@ export default {
     data() {
         return {
             userInfo: [],
+            skinPaths: {
+                skinPath: '',
+                capePath: '',
+                defaultSkinPath: '',
+            },
             depositValue: '',
             depositSelectedCurrency: 'UAH',
             currencyMultiplier: 0,
@@ -163,21 +173,24 @@ export default {
         }
     },
     created() {
-        axios.get('/cabinet/user-info')
-            .then(res => {
-                console.log(res.data);
-                this.userInfo = res.data;
-            })
-            .catch(error => {
-                console.log(error);
-            });
+        this.getUserInfo();
     },
     mounted() {
-        this.getCommonCurrencyMultiplier();
+        this.getCommonCurrencyMultiplier()
     },
     methods: {
+        getUserInfo() {
+            axios.get('/cabinet/user-info')
+                .then(res => {
+                    console.log(res.data);
+                    this.userInfo = res.data;
+                })
+                .catch(error => {
+                    console.log(error);
+                });
+        },
         getCommonCurrencyMultiplier() {
-            axios.get('/cabinet/common-currency-multiplier', { params: { currency: this.depositSelectedCurrency } })
+            return axios.get('/cabinet/common-currency-multiplier', {params: {currency: this.depositSelectedCurrency}})
                 .then(res => {
                     this.currencyMultiplier = res.data;
                     this.calculateTotalCoins();
@@ -190,10 +203,17 @@ export default {
             this.calculateTotalCoins();
         },
         depositSubmit() {
-            alert(this.totalCoins);
+            this.makePayment(this.depositValue, this.depositSelectedCurrency);
         },
         calculateTotalCoins() {
             this.totalCoins = (this.depositValue * this.currencyMultiplier).toFixed(2);
+        },
+        makePayment(amount, currency) {
+            axios.post('/cabinet/pay', {amount: amount, currency: currency})
+                .then(res => {
+                    console.log(res.data);
+                    location.href = res.data.url + '?data=' + res.data.data + '&signature=' + res.data.signature;
+                });
         }
     }
 }

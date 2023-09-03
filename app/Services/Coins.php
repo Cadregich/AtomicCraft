@@ -7,7 +7,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use InvalidArgumentException;
 
-class PaymentService
+class Coins
 {
     private $ratesRelationUAH;
     private $ratesRelationCoins = [];

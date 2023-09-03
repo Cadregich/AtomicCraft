@@ -40,6 +40,11 @@ const router = createRouter({
             name: 'cabinet'
         },
         {
+            path: '/payment-finished',
+            component: () => import('./components/PaymentFinished.vue'),
+            name: 'payment-finished'
+        },
+        {
             path: '/test',
             component: () => import('./components/Test.vue'),
             name: 'test'
