@@ -70,7 +70,7 @@ export default {
                 });
                 console.log(response.data);
                 if (response) {
-                    // this.$store.commit('setUserName', response.data);
+                    this.$store.commit('setUserName', response.data);
                     this.$store.dispatch('login');
                 }
             } catch (error) {

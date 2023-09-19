@@ -6,15 +6,15 @@ import modal from "./stores/modal.js"
 const store = new Vuex.Store({
     state: {
         isAuthenticated: false,
-        // userName: '',
+        userName: '',
     },
     mutations: {
         setAuthentication(state, status) {
             state.isAuthenticated = status;
         },
-        // setUserName(state, name) {
-        //     state.userName = name;
-        // },
+        setUserName(state, name) {
+            state.userName = name;
+        },
     },
     actions: {
         login({commit}) {
@@ -38,9 +38,9 @@ const store = new Vuex.Store({
     getters: {
         Auth: state => state.isAuthenticated,
 
-        // userName: (state) => {
-        //     return state.userName;
-        // },
+        userName: (state) => {
+            return state.userName;
+        },
     },
     modules: {
         shop,

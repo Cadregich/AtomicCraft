@@ -13,14 +13,14 @@ export default {
     components: {
         Navbar
     },
-    mounted() {
-        // axios.get('/user/name')
-        //     .then(res => {
-        //         this.$store.commit('setUserName', res.data);
-        //     })
-        //     .catch(error => {
-        //         console.log(error);
-        //     });
+    async mounted() {
+        await axios.get('/user/name')
+            .then(res => {
+                this.$store.commit('setUserName', res.data);
+            })
+            .catch(error => {
+                console.log(error);
+            });
     },
     async created() {
         if (await this.$store.dispatch('getCookie', 'ait')) {
