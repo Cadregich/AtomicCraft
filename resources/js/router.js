@@ -36,12 +36,12 @@ const router = createRouter({
         },
         {
             path: '/cabinet',
-            component: () => import('./components/Cabinet.vue'),
+            component: () => import('./components/Cabinet/Cabinet.vue'),
             name: 'cabinet'
         },
         {
             path: '/payment-finished',
-            component: () => import('./components/PaymentFinished.vue'),
+            component: () => import('./components/Shop/PaymentFinished.vue'),
             name: 'payment-finished'
         },
         {
@@ -51,17 +51,17 @@ const router = createRouter({
         },
         {
             path: '/shop',
-            component: () => import('./components/Shop.vue'),
+            component: () => import('./components/Shop/Shop.vue'),
             name: 'shop'
         },
         {
             path: '/shop/create',
-            component: () => import('./components/ShopCreateProduct.vue'),
+            component: () => import('./components/Shop/ShopCreateProduct.vue'),
             name: 'shop.create'
         },
         {
             path: '/shop/purchases-history',
-            component: () => import('./components/PurchasesHistory.vue'),
+            component: () => import('./components/Shop/PurchasesHistory.vue'),
             name: 'shop.purchases-history'
         }
     ],
