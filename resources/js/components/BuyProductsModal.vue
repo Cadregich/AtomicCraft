@@ -45,7 +45,7 @@ export default {
     },
     computed: {
         productData() {
-            return this.$store.getters.getCart;
+            return this.$store.state.shop.cart;
         }
     },
     data() {
