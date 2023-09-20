@@ -37,7 +37,7 @@ Route::namespace('App\Http\Controllers')->group(function () {
         Route::post('/skin', 'PlayerAssetsController@upload');
         Route::delete('/skin', 'PlayerAssetsController@reset');
         Route::get('/common-currency-multiplier', 'CabinetController@getCommonCurrencyMultiplier');
-        Route::post('/check-daily-gift', 'DailyGiftController');
+        Route::post('/daily-gift', 'DailyGiftController')->middleware('session.user');
         Route::get('/assetPaths', 'CabinetController@getSkinAndCapePaths');
     });
 

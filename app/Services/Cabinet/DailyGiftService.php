@@ -34,7 +34,7 @@ class DailyGiftService
         return 0;
     }
 
-    public function userGiftStatusAndCount($userId): array
+    public function getUserGiftStatusAndCount($userId): array
     {
         $entry = UserDailyGiftStatus::firstOrCreate([
             'user_id' => $userId
