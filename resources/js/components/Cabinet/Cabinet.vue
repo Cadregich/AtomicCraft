@@ -24,42 +24,45 @@
                 <tr>
                     <td class="text-center text-info" colspan="2">Возможности</td>
                 </tr>
-                <tr>
-                    <td>Смена ника</td>
-                    <td>
-                        <template v-if="userInfo.capabilitiesFromTotalDonate.nickChange ">
-                            <i class="fa-solid fa-check"></i>
-                        </template>
-                        <template v-else>
-                            <i class="fa-solid fa-xmark"></i>
-                            <a class="how-get" title="Необходимо за 1 раз пополнить баланс от 100 монет">?</a>
-                        </template>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Загружать плащи</td>
-                    <td>
-                        <template v-if="userInfo.capabilitiesFromTotalDonate.capeChange">
-                            <i class="fa-solid fa-check"></i>
-                        </template>
-                        <template v-else>
-                            <i class="fa-solid fa-xmark"></i>
-                            <a class="how-get" title="Необходимо за 1 раз пополнить баланс от 250 монет">?</a>
-                        </template>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Загружать hd скины</td>
-                    <td>
-                        <template v-if="userInfo.capabilitiesFromTotalDonate.hdSkinsAndCapeUpload">
-                            <i class="fa-solid fa-check"></i>
-                        </template>
-                        <template v-else>
-                            <i class="fa-solid fa-xmark"></i>
-                            <a class="how-get" title="Необходимо за 1 раз пополнить баланс от 400 монет">?</a>
-                        </template>
-                    </td>
-                </tr>
+                <template v-if="userInfo.capabilitiesFromTotalDonate">
+                    <tr>
+                        <td>Смена ника</td>
+                        <td>
+                            <template v-if="userInfo.capabilitiesFromTotalDonate.nickChange ">
+                                <i class="fa-solid fa-check"></i>
+                            </template>
+                            <template v-else>
+                                <i class="fa-solid fa-xmark"></i>
+                                <a class="how-get" title="Необходимо за 1 раз пополнить баланс от 100 монет">?</a>
+                            </template>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Загружать плащи</td>
+                        <td>
+                            <template v-if="userInfo.capabilitiesFromTotalDonate.capeChange">
+                                <i class="fa-solid fa-check"></i>
+                            </template>
+                            <template v-else>
+                                <i class="fa-solid fa-xmark"></i>
+                                <a class="how-get" title="Необходимо за 1 раз пополнить баланс от 250 монет">?</a>
+                            </template>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Загружать hd скины</td>
+                        <td>
+                            <template v-if="userInfo.capabilitiesFromTotalDonate.hdSkinsAndCapeUpload">
+                                <i class="fa-solid fa-check"></i>
+                            </template>
+                            <template v-else>
+                                <i class="fa-solid fa-xmark"></i>
+                                <a class="how-get" title="Необходимо за 1 раз пополнить баланс от 400 монет">?</a>
+                            </template>
+                        </td>
+                    </tr>
+                </template>
+
                 </tbody>
             </table>
         </div>
@@ -83,7 +86,7 @@
 
         <div class="daily-gift-block atomic-block column-center">
             <h4>Подарок за ежедневный вход</h4>
-            <form action="" method="post">
+            <form @submit.prevent="checkDailyGift()">
                 <button class="bg-none bg-transparent border-0" type="submit">
                     <i class="gift mt-3 fa-solid fa-gift"></i>
                 </button>
@@ -147,6 +150,13 @@ export default {
                 .catch(error => {
                     console.log(error);
                 });
+        },
+        checkDailyGift() {
+            axios.post('/cabinet/daily-gift')
+                .then(res => {
+                    alert(res.data.message)
+                    console.log(res.data);
+                })
         }
     }
 }
