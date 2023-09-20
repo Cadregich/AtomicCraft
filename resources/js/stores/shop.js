@@ -2,7 +2,7 @@ const shop= {
     state: {
         products: [],
         productsFilters: {},
-        cart: {}
+        productData: {}
     },
     mutations: {
         setProducts(state, products) {
@@ -13,17 +13,17 @@ const shop= {
         },
 
         addToCart(state, product) {
-            state.cart = product;
+            state.productData = product;
         },
 
         clearCart(state) {
-            state.cart = [];
+            state.productData = [];
         }
     },
     actions: {
         addToCart(context, product) {
             context.commit('addToCart', product);
-            console.log(context.state.cart);
+            console.log(context.state.productData);
         },
 
         clearCart(context) {
