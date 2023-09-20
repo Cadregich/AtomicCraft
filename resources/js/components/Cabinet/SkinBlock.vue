@@ -49,7 +49,7 @@
 <script>
 import skinViewer from "./SkinViewer.vue";
 import skinHead from "./SkinHead.vue";
-import {Notification} from '../notifications.js';
+import {Notification} from "@/notifications.js";
 
 export default {
     name: "SkinBlock",

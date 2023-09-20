@@ -15,7 +15,7 @@ export default {
             console.log(response.data);
             if (response) {
                 this.$store.dispatch('logout');
-                // this.$store.commit('setUserName', '');
+                this.$store.commit('setUserName', '');
             }
         } catch (error) {
             console.error(error);

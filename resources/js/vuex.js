@@ -1,40 +1,20 @@
 import Vuex from 'vuex';
-import {Modal} from "bootstrap";
+import shop from "./stores/shop.js";
+import modal from "./stores/modal.js"
+
 
 const store = new Vuex.Store({
     state: {
         isAuthenticated: false,
-        // userName: '',
-        products: [],
-        productsFilters: {},
-        modal: null,
-        cart: {}
+        userName: '',
     },
     mutations: {
         setAuthentication(state, status) {
             state.isAuthenticated = status;
         },
-        // setUserName(state, name) {
-        //     state.userName = name;
-        // },
-        setProducts(state, products) {
-            state.products = products;
+        setUserName(state, name) {
+            state.userName = name;
         },
-        setProductsFilters(state, filters) {
-            state.productsFilters = filters;
-        },
-
-        createModal(state, modalId) {
-            state.modal = new Modal(document.getElementById(modalId));
-        },
-
-        addToCart(state, product) {
-            state.cart = product;
-        },
-
-        clearCart(state) {
-            state.cart = [];
-        }
     },
     actions: {
         login({commit}) {
@@ -54,45 +34,17 @@ const store = new Vuex.Store({
             }
             return null;
         },
-
-        addToCart(context, product) {
-            context.commit('addToCart', product);
-            console.log(context.state.cart);
-        },
-
-        clearCart(context) {
-            context.commit('clearCart');
-        },
-
-        openModal(context, modalId) {
-            context.commit('createModal', modalId);
-            context.state.modal.show();
-            console.log(context.state.modal);
-        },
-
-        closeModal(context) {
-            context.state.modal.hide();
-            context.state.modal = null;
-        },
     },
     getters: {
-        // userName: (state) => {
-        //     return state.userName;
-        // },
-
         Auth: state => state.isAuthenticated,
 
-        getPaginatorResult: (state) => {
-            return state.products;
+        userName: (state) => {
+            return state.userName;
         },
-
-        getProductsFilters: (state) => {
-            return state.productsFilters;
-        },
-
-        getCart: (state) => {
-            return state.cart;
-        }
+    },
+    modules: {
+        shop,
+        modal
     }
 });
 

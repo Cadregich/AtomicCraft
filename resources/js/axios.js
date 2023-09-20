@@ -16,13 +16,12 @@ axios.interceptors.response.use(response => {
 
             store.dispatch('logout');
             router.push({name: 'login'});
-            // store.commit('setUserName', '');
+            store.commit('setUserName', '');
         }
         return Promise.reject(error);
     });
 
 axios.interceptors.request.use(config => {
-    // Добавляем '/api' к началу URL, если config.url не начинается с '/'
     if (config.url.startsWith('/')) {
         config.url = '/api' + config.url;
     }

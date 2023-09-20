@@ -114,7 +114,7 @@ export default {
     },
     computed: {
         Products() {
-            return this.$store.getters.getPaginatorResult;
+            return this.$store.state.shop.products;
         },
     },
     mounted() {

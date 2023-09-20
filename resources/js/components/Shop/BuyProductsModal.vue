@@ -34,7 +34,7 @@
 </template>
 
 <script>
-import ModalLayout from './ModalLayout.vue'
+import ModalLayout from '../ModalLayout.vue'
 import ThanksModal from './ThanksModal.vue'
 
 export default {
@@ -45,7 +45,7 @@ export default {
     },
     computed: {
         productData() {
-            return this.$store.getters.getCart;
+            return this.$store.state.shop.productData;
         }
     },
     data() {
@@ -118,7 +118,7 @@ export default {
     outline: none;
     background: none;
     width: 50px;
-    border: 1px solid gray;
+    border: 1px solid #808080;
     border-radius: 10px;
     color: lightgray;
     font-size: 15px;

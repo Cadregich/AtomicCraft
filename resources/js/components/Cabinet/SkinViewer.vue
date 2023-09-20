@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import '../skinview3d.bundle.js';
+import '@/skinview3d.bundle.js';
 
 let skinViewer;
 export default {
