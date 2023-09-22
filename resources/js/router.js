@@ -7,18 +7,18 @@ const router = createRouter({
     routes: [
         {
             path: '/',
-            component: () => import('./components/Home.vue'),
+            component: () => import('./components/HomePage.vue'),
             name: 'home'
         },
         {
             path: '/registration',
-            component: () => import('./components/Registration.vue'),
+            component: () => import('./components/RegistrationPage.vue'),
             name: 'registration',
             beforeEnter: middlewares.guest
         },
         {
             path: '/login',
-            component: () => import('./components/Login.vue'),
+            component: () => import('./components/LoginPage.vue'),
             name: 'login',
             beforeEnter: middlewares.guest
         },
@@ -30,13 +30,13 @@ const router = createRouter({
         },
         {
             path: '/logout',
-            component: () => import('./components/Logout.vue'),
+            component: () => import('./components/LogoutPage.vue'),
             name: 'logout',
             beforeEnter: middlewares.auth
         },
         {
             path: '/cabinet',
-            component: () => import('./components/Cabinet/Cabinet.vue'),
+            component: () => import('./components/Cabinet/CabinetPage.vue'),
             name: 'cabinet'
         },
         {
@@ -51,7 +51,7 @@ const router = createRouter({
         },
         {
             path: '/shop',
-            component: () => import('./components/Shop/Shop.vue'),
+            component: () => import('./components/Shop/ShopPage.vue'),
             name: 'shop'
         },
         {

@@ -40,8 +40,8 @@ class Payment
             'version' => '3',
             'public_key' => $public_key,
             'private_key' => $private_key,
-            'server_url' => 'http://atomiccraft/api/payment-finished',
-            'result_url' => 'http://atomiccraft/payment-finished',
+            'server_url' => 'http://atomiccraft/api/callback/liqpay',
+            'result_url' => 'http://atomiccraft/api/cabinet/liqpay',
         ];
         $liqpay = new Liqpay($public_key, $private_key);
         return $liqpay->getApiParams($paymentData);

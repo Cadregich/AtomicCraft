@@ -41,27 +41,17 @@ Route::namespace('App\Http\Controllers')->group(function () {
         Route::get('/assetPaths', 'CabinetController@getSkinAndCapePaths');
     });
 
-    Route::post('/payment-finished', function (Request $request) {
-        $filePath = storage_path('app/data.json');
+    /*
+     * For now, payment system servers cannot send callbacks to my api because the server is running locally.
+     * Temporarily, payment data will be received from a link to which payment systems redirect the user
+     * along with payment data. After uploading to the hosting, the system will be rebuilt
+     */
 
-        file_put_contents($filePath, 'dasdasdasdas');
-        \App\Models\Payment::create([
-            'user_id' => 1,
-            'amount' => 23,
-            'currency' => 'USD',
-            'payment_system' => 'liqpay',
-            'payment_id' => 'asdsasdfkfdsp'
-        ]);
-            $data = $request->all();
-            $jsonData = json_encode($data, JSON_PRETTY_PRINT);
-
-            // Укажите путь к файлу, в который хотите записать данные
-            $filePath = storage_path('app/data.json');
-
-            file_put_contents($filePath, $jsonData);
-
-            return redirect('http://atomiccraft');
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::post('/callback/liqpay', 'PaymentCallbackController@Liqpay')->middleware('session.user');
+        Route::post('/cabinet/liqpay', 'PaymentCallbackController@Liqpay')->middleware('session.user');
     });
+
 
     Route::prefix('shop')->namespace('Shop')->group(function () {
         Route::get('/goods-mods', function () {
