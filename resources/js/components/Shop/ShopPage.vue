@@ -449,7 +449,7 @@ export default {
     margin-top: 15px !important;
     font-size: 15px;
     height: 30px;
-    color: gray;
+    color: #808080;
 }
 
 .card-button-area {
