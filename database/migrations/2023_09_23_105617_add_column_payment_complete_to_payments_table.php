@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('payments', function (Blueprint $table) {
-            $table->string('payment_system')->after('currency');
-            $table->string('payment_id')->after('payment_system')->nullable()->unique();
+            $table->string('order_id')->after('payment_id')->unique();
+            $table->boolean('payment_complete')->after('order_id')->default(false);
         });
     }
 
@@ -23,8 +23,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('payments', function (Blueprint $table) {
-            $table->dropColumn('payment_system');
-            $table->dropColumn('payment_id');
+            $table->dropColumn('order_id');
+            $table->dropColumn('payment_complete');
         });
     }
 };
