@@ -11,7 +11,6 @@ use Illuminate\Http\Request;
 
 class CabinetController extends Controller
 {
-    private $totalDonate;
     protected $userDataService;
     protected $paymentService;
     protected $playerAssets;
@@ -34,7 +33,15 @@ class CabinetController extends Controller
         $amount = $request->input('amount');
         $currency = $request->input('currency');
         $payment = new Payment($amount, $currency);
-        return $payment->LiqPay();
+        $orderId = $payment->generateRandomId();
+        \App\Models\Payment::create([
+            'user_id' => session('user')['id'],
+            'amount' => $amount,
+            'currency' => $currency,
+            'payment_system' => 'liqpay',
+            'order_id' => $orderId
+        ]);
+        return $payment->LiqPay($orderId);
     }
 
     public function getUserInfo(Request $request): array

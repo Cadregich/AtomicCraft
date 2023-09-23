@@ -14,6 +14,8 @@ class Payment extends Model
         'amount',
         'currency',
         'payment_system',
-        'payment_id'
+        'payment_id',
+        'order_id',
+        'payment_complete'
     ];
 }

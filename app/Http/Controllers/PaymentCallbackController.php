@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 /*
  * Processes callbacks after making a payment from payment systems
@@ -15,26 +16,22 @@ class PaymentCallbackController extends Controller
         $data = $request->input('data');
         $signature = $request->input('signature');
         $private_key = env('LIQPAY_PRIVATE_KEY');
+        $expected_signature = base64_encode(sha1($private_key . $data . $private_key, 1 ));
 
-        $sign = base64_encode(sha1($private_key . $data . $private_key, 1 ));
-
-        $data = base64_decode($data);
-        $filePath = storage_path('app/log.json');
-        $content = json_encode(compact('sign', 'signature', 'data'));
-        file_put_contents($filePath, $content);
-
-        $data = json_decode($data);
-
-        if ($sign === $signature) {
+        if ($expected_signature === $signature) {
             $status = 'pass';
-
-            \App\Models\Payment::create([
-                'user_id' => session('user')['id'],
-                'amount' => $data->amount,
-                'currency' => $data->currency,
-                'payment_system' => 'liqpay',
-                'payment_id' => $data->payment_id
-            ]);
+            $data = json_decode(base64_decode($data));
+            try {
+                \App\Models\Payment::where('order_id', $data->order_id)->update([
+                    'amount' => $data->amount,
+                    'currency' => $data->currency,
+                    'payment_id' => $data->payment_id,
+                    'payment_complete' => true,
+                ]);
+            } catch (\Exception $e) {
+                Log::channel('payment')->info('Ошибка создания платежа ' . $data->payment_id .
+                    ' | Ошибка: ' . $e->getMessage());
+            }
         }
 
         return redirect('http://atomiccraft/cabinet?status=' . $status);

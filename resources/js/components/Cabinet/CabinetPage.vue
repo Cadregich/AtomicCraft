@@ -52,7 +52,7 @@
                     <tr>
                         <td>Загружать hd скины</td>
                         <td>
-                            <template v-if="userInfo.capabilitiesFromTotalDonate.hdSkinsAndCapeUpload">
+                            <template v-if="userInfo.capabilitiesFromTotalDonate.hdSkinsUpload">
                                 <i class="fa-solid fa-check"></i>
                             </template>
                             <template v-else>

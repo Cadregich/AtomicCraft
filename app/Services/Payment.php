@@ -27,8 +27,11 @@ class Payment
         $this->currency = $currency;
     }
 
-    public function LiqPay()
+    public function LiqPay($orderId = null)
     {
+        if (!$orderId) {
+            $orderId = $this->generateRandomId();
+        }
         $public_key = env('LIQPAY_PUBLIC_KEY');
         $private_key = env('LIQPAY_PRIVATE_KEY');
         $paymentData = [
@@ -36,7 +39,7 @@ class Payment
             'amount' => $this->amount,
             'currency' => $this->currency,
             'description' => $this->paymentDescription,
-            'order_id' => $this->generateRandomId(),
+            'order_id' => $orderId,
             'version' => '3',
             'public_key' => $public_key,
             'private_key' => $private_key,
@@ -47,7 +50,7 @@ class Payment
         return $liqpay->getApiParams($paymentData);
     }
 
-    private function generateRandomId($length = 30)
+    public function generateRandomId($length = 30)
     {
         $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
         $randomString = '';

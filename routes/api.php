@@ -32,7 +32,7 @@ Route::namespace('App\Http\Controllers')->group(function () {
 
     Route::middleware('auth:sanctum')->prefix('cabinet')->namespace('Cabinet')->group(function () {
         Route::get('/', 'CabinetController');
-        Route::post('/pay', 'CabinetController@pay');
+        Route::post('/pay', 'CabinetController@pay')->middleware('session.user');
         Route::get('/user-info', 'CabinetController@getUserInfo');
         Route::post('/skin', 'PlayerAssetsController@upload');
         Route::delete('/skin', 'PlayerAssetsController@reset');
@@ -47,10 +47,8 @@ Route::namespace('App\Http\Controllers')->group(function () {
      * along with payment data. After uploading to the hosting, the system will be rebuilt
      */
 
-    Route::middleware('auth:sanctum')->group(function () {
-        Route::post('/callback/liqpay', 'PaymentCallbackController@Liqpay')->middleware('session.user');
-        Route::post('/cabinet/liqpay', 'PaymentCallbackController@Liqpay')->middleware('session.user');
-    });
+        Route::post('/callback/liqpay', 'PaymentCallbackController@Liqpay');
+        Route::post('/cabinet/liqpay', 'PaymentCallbackController@Liqpay');
 
 
     Route::prefix('shop')->namespace('Shop')->group(function () {
