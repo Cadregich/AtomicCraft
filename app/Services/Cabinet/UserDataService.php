@@ -23,7 +23,9 @@ class UserDataService
 
     public function getAllDonates($userId) {
         return Payment::select('amount', 'currency')
-            ->where('user_id', $userId)->get();
+            ->where('user_id', $userId)
+            ->where('payment_complete', true)
+            ->get();
     }
 
     public function getCapabilitiesFromTotalDonate($totalDonate): array {

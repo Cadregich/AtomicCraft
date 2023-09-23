@@ -11,7 +11,6 @@ use Illuminate\Http\Request;
 
 class CabinetController extends Controller
 {
-    private $totalDonate;
     protected $userDataService;
     protected $paymentService;
     protected $playerAssets;
