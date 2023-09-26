@@ -1,7 +1,9 @@
 <template>
     <div>
         <navbar/>
-        <router-view></router-view>
+        <template v-if="typeof userNickname === 'string' && userNickname">
+            <router-view></router-view>
+        </template>
     </div>
 </template>
 
@@ -13,8 +15,13 @@ export default {
     components: {
         Navbar
     },
-    async mounted() {
-        await axios.get('/user/name')
+    computed: {
+        userNickname() {
+            return this.$store.state.userName;
+        }
+    },
+    mounted() {
+        axios.get('/user/name')
             .then(res => {
                 this.$store.commit('setUserName', res.data);
             })

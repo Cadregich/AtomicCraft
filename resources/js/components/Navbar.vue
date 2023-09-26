@@ -58,7 +58,7 @@
                     <ul class="navbar-nav mb-lg-0">
                         <li class="nav-item" v-if="auth">
                             <div class="nav-link dropdown-toggle" href="#">
-                                Cadregich
+                                {{ this.userName }}
                             </div>
                         </li>
                     </ul>
@@ -110,6 +110,9 @@ export default {
     computed: {
         auth() {
             return this.$store.getters.Auth;
+        },
+        userName() {
+            return this.$store.state.userName;
         }
     },
     methods: {
