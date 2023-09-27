@@ -41,6 +41,8 @@ class ResetGiftStatus extends Command
     public function handle()
     {
         try {
+            UserDailyGiftStatus::where('award_received', false)
+                ->update(['days_received' => 0]);
             UserDailyGiftStatus::where('award_received', true)
                 ->update(['award_received' => false]);
         } catch (Exception $e) {
