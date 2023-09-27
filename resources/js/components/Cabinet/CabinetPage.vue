@@ -91,12 +91,21 @@
                     <i class="gift mt-3 fa-solid fa-gift"></i>
                 </button>
             </form>
-
-            <span class="mt-3">Вы получаете подарок <span class="text-info fst-italic">5</span> суток подряд</span>
-            <span class="">
-                Сегодня вы можете получить <span class="text-info">Слиток железа </span>
-                <span class="fst-italic"> х30</span>
+            <template v-if="dailyGiftData.nextGift">
+                <template v-if="dailyGiftData.status">
+                    <span class="mt-3">Вы получаете подарок <span class="text-info fst-italic">{{ dailyGiftData.days_received }}</span> суток подряд</span>
+                    <span class="">
+                Сегодня вы можете получить <span class="text-info">{{ dailyGiftData.nextGift.title }} </span>
+                <span class="fst-italic"> х{{ dailyGiftData.nextGift.count }}</span>
             </span>
+                </template>
+                <span v-else class="d-flex flex-column align-items-center">
+                Подарок за сегодня успешно получен! <br>
+                <span>Завра вы сможете получить <span class="text-info fst-italic">
+                    {{ dailyGiftData.nextGift.title }}</span> х{{ dailyGiftData.nextGift.count }}</span>
+            </span>
+            </template>
+
         </div>
         <div class="ref-and-promo-block">
             <div class="promo-block atomic-block w-100 column-center">
@@ -120,6 +129,7 @@
 <script>
 import SkinBlock from "./SkinBlock.vue";
 import PaymentBlock from "./PaymentBlock.vue";
+import {Notification} from "@/notifications.js";
 
 export default {
     components: {
@@ -135,10 +145,12 @@ export default {
                 capePath: '',
                 defaultSkinPath: '',
             },
+            dailyGiftData: {}
         }
     },
-    created() {
-        this.getUserInfo();
+    async created() {
+        await this.getUserInfo();
+        this.getDailyGiftData();
     },
     methods: {
         getUserInfo() {
@@ -151,11 +163,19 @@ export default {
                     console.log(error);
                 });
         },
+        getDailyGiftData() {
+            axios.get('/cabinet/daily-gift')
+                .then(res => {
+                    console.log(res.data)
+                    this.dailyGiftData = res.data;
+                })
+        },
         checkDailyGift() {
             axios.post('/cabinet/daily-gift')
                 .then(res => {
-                    alert(res.data.message)
+                    Notification.error('Подарок успешно получен!')
                     console.log(res.data);
+                    this.getDailyGiftData();
                 })
         }
     }

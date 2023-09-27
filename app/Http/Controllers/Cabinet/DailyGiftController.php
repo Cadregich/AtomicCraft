@@ -3,14 +3,15 @@
 namespace App\Http\Controllers\Cabinet;
 
 use App\Http\Controllers\Controller;
+use App\Models\DailyGift;
+use App\Models\UserDailyGiftStatus;
 use App\Services\Cabinet\DailyGiftService;
 use Exception;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 
 class DailyGiftController extends Controller
 {
-    private $UserDailyGiftStatus;
+    private DailyGiftService $UserDailyGiftStatus;
 
     public function __construct(DailyGiftService $UserDailyGiftStatus)
     {
@@ -27,7 +28,7 @@ class DailyGiftController extends Controller
      * @throws Exception
      */
 
-    public function __invoke()
+    public function getDailyGift()
     {
         $userId = session('user')['id'];
         $giftInfo = $this->UserDailyGiftStatus->getUserGiftStatusAndCount($userId);
@@ -42,7 +43,8 @@ class DailyGiftController extends Controller
 
         DB::beginTransaction();
         try {
-            $this->UserDailyGiftStatus->addGiftToTheSendQueueTable($userId, $giftInfo['daysReceived'] + 1);
+            $nextGiftId = $this->getNextGiftData($giftInfo['daysReceived'])->id;
+            $this->UserDailyGiftStatus->addGiftToTheSendQueueTable($userId, $nextGiftId);
             $this->UserDailyGiftStatus->updateUserGiftStatus($userId);
             DB::commit();
             return ['status' => 1, 'massage' => 'Gift was sent successfully'];
@@ -50,5 +52,32 @@ class DailyGiftController extends Controller
             DB::rollback();
             throw $e;
         }
+    }
+
+    public function getDailyGiftData() {
+        $userId = session('user')['id'];
+        $giftData = UserDailyGiftStatus::select(['award_received', 'days_received'])
+            ->where('user_id', $userId)->first();
+        $nextGift = $this->getNextGiftData($giftData['days_received']);
+
+        if (!$nextGift) {
+            $this->resetDaysReceived($userId);
+            $nextGift = $this->getNextGiftData(0);
+        }
+        $giftData['nextGift'] = $nextGift;
+
+        $giftData['status'] = !$giftData['award_received'] ? 1 : 0;
+
+        return $giftData;
+    }
+
+    private function getNextGiftData($daysReceived) {
+        return DailyGift::select(['id', 'title', 'count'])->skip($daysReceived)->take(1)->first();
+    }
+
+    private function resetDaysReceived($userId) {
+        UserDailyGiftStatus::where('user_id', $userId)->update([
+            'days_received' => 0
+        ]);
     }
 }
