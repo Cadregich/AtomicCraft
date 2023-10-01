@@ -64,12 +64,15 @@ class DailyGiftController extends Controller
             $this->resetDaysReceived($userId);
             $nextGift = $this->getNextGiftData(0);
         }
+
         $giftData['nextGift'] = $nextGift;
 
         $giftData['status'] = !$giftData['award_received'] ? 1 : 0;
 
         return $giftData;
     }
+
+
 
     private function getNextGiftData($daysReceived) {
         return DailyGift::select(['id', 'title', 'count'])->skip($daysReceived)->take(1)->first();
