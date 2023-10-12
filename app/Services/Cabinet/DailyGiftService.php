@@ -7,39 +7,41 @@ use App\Models\ReadyGifts;
 use App\Models\UserDailyGiftStatus;
 use Illuminate\Support\Facades\DB;
 
-
 class DailyGiftService
 {
     public function addGiftToTheSendQueueTable($userId, $giftId)
     {
         ReadyGifts::create([
             'user_id' => $userId,
-            'gift_id' => $giftId
-        ]);
-    }
-    public function updateUserGiftStatus($userId)
-    {
-        UserDailyGiftStatus::where('user_id', $userId)->update([
-            'award_received' => true,
-            'days_received' => DB::raw('days_received + 1')
+            'gift_id' => $giftId,
         ]);
     }
 
-    public function resetDaysReceived($userId):int
+    public function updateUserGiftStatus($userId, $serverId)
     {
-        UserDailyGiftStatus::where('user_id', $userId)->update([
+        UserDailyGiftStatus::where('user_id', $userId)
+            ->where('server_id', $serverId)->update([
+                'award_received' => true,
+                'days_received' => DB::raw('days_received + 1')
+            ]);
+    }
+
+    public function resetDaysReceived($userId, $serverId): int
+    {
+        UserDailyGiftStatus::where('user_id', $userId)->where('server_id', $serverId)->update([
             'days_received' => 0
         ]);
 
         return 0;
     }
 
-    public function getUserGiftStatusAndCount($userId): array
+    public function getUserGiftStatusAndCount($userId, $serverId): array
     {
         $entry = UserDailyGiftStatus::firstOrCreate([
-            'user_id' => $userId
+            'user_id' => $userId,
+            'server_id' => $serverId
         ]);
-        $maxGifts = Gift::count();
+        $maxGifts = Gift::where('server_id', $serverId)->count();
 
         return [
             'isGiftReceived' => $entry->award_received,

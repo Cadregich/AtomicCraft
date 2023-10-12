@@ -73,6 +73,14 @@
 
         <div class="privileges-block atomic-block column-center">
             <h4><i class="cabinet-block-title-icon fa-solid fa-shopping-basket"></i>Привилегии</h4>
+            <div class="d-flex mt-2 mb-1" style="font-size: 19px">
+                <label for="select_server">Cервер:</label>
+                <select  v-model="privilegesServer" @change="" style="margin-left: 10px"
+                         id="select_server" class="atomic-input" aria-label="Сервер"
+                         name="currency">
+                    <option selected value="Atomic Fragility">Atomic Fragility</option>
+                </select>
+            </div>
             <div class="privileges mt-2">
                 <template v-for="i in 6">
                     <div class="privilege-tile column-center">
@@ -86,6 +94,15 @@
 
         <div class="daily-gift-block atomic-block column-center">
             <h4>Подарок за ежедневный вход</h4>
+            <div class="d-flex">
+                <label for="select_server">Cервер:</label>
+                <select  v-model="dailyGiftServer" @change="" style="margin-left: 10px"
+                         id="select_server" class="atomic-input" aria-label="Сервер"
+                         name="currency">
+                    <option selected value="Atomic Fragility">Atomic Fragility</option>
+                </select>
+            </div>
+
             <form @submit.prevent="checkDailyGift()">
                 <button class="bg-none bg-transparent border-0" type="submit">
                     <i class="gift mt-3 fa-solid fa-gift"></i>
@@ -145,7 +162,9 @@ export default {
                 capePath: '',
                 defaultSkinPath: '',
             },
-            dailyGiftData: {}
+            dailyGiftData: {},
+            privilegesServer: 'Atomic Fragility',
+            dailyGiftServer: 'Atomic Fragility'
         }
     },
     async created() {
@@ -164,14 +183,14 @@ export default {
                 });
         },
         getDailyGiftData() {
-            axios.get('/cabinet/daily-gift')
+            axios.get('/cabinet/daily-gift', { params: { server: this.dailyGiftServer }})
                 .then(res => {
                     console.log(res.data)
                     this.dailyGiftData = res.data;
                 })
         },
         checkDailyGift() {
-            axios.post('/cabinet/daily-gift')
+            axios.post('/cabinet/daily-gift', {  server: this.dailyGiftServer })
                 .then(res => {
                     Notification.error('Подарок успешно получен!')
                     console.log(res.data);
