@@ -9,6 +9,12 @@ class Privilege extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'server_id',
+        'title',
+        'capabilities'
+    ];
+
     public function users()
     {
         return $this->hasMany(User::class, 'privilage_id');
