@@ -40,6 +40,11 @@ const router = createRouter({
             name: 'cabinet'
         },
         {
+            path: '/privileges',
+            component: () => import('./components/PrivilegesPage.vue'),
+            name: 'privileges'
+        },
+        {
             path: '/payment-finished',
             component: () => import('./components/Shop/PaymentFinished.vue'),
             name: 'payment-finished'

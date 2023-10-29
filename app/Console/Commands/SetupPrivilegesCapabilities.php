@@ -8,7 +8,7 @@ use Illuminate\Console\Command;
 
 class SetupPrivilegesCapabilities extends Command
 {
-    protected $signature = 'privilege:setup {--server=}';
+    protected $signature = 'privileges:setup {--server=}';
 
     protected $description = 'Set privilege capabilities to DB';
 
@@ -20,7 +20,7 @@ class SetupPrivilegesCapabilities extends Command
     public function handle()
     {
         if ($this->option('server') === 'AtomicFragility') {
-            $privileges = config('privileges.AtomicFragility');
+            $privileges = config('privileges.AtomicFragility.privileges');
 
             Privilege::query()->delete();
 
