@@ -73,12 +73,18 @@
 
         <div class="privileges-block atomic-block column-center">
             <h4><i class="cabinet-block-title-icon fa-solid fa-shopping-basket"></i>Привилегии</h4>
+            <div style="font-size: 23px">
+                <router-link :to="{ path: '/privileges', query: { server: privilegesServer}}"
+                             style="color: white">
+                    Информация о привилегиях
+                </router-link>
+            </div>
             <div class="d-flex mt-2 mb-1" style="font-size: 19px">
                 <label for="select_server">Cервер:</label>
                 <select  v-model="privilegesServer" @change="" style="margin-left: 10px"
                          id="select_server" class="atomic-input" aria-label="Сервер"
                          name="currency">
-                    <option selected value="Atomic Fragility">Atomic Fragility</option>
+                    <option selected :value="privilegesServer">{{ privilegesServer }}</option>
                 </select>
             </div>
             <div class="privileges mt-2">

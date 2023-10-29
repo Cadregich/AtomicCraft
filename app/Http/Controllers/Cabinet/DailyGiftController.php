@@ -61,7 +61,7 @@ class DailyGiftController extends Controller
         $serverId = Server::where('server_name', $request->input('server'))->value('id');
         $userId = session('user')['id'];
         $giftData = UserDailyGiftStatus::firstOrNew(['user_id' => $userId, 'server_id' => $serverId]);
-        if (gettype($giftData['days_received']) !== 'integer' || gettype($giftData['award_received']) !== 'integer') {
+        if (!is_int($giftData->days_received) || !is_int($giftData->award_received)) {
             $giftData['award_received'] = 0;
             $giftData['days_received'] = 0;
         }
@@ -92,13 +92,4 @@ class DailyGiftController extends Controller
             'days_received' => 0
         ]);
     }
-
-//    private function initializeUserGiftStatus($userId, $serverId) {
-//        UserDailyGiftStatus::create([
-//            'user_id' => $userId,
-//            'server_Id' => $serverId,
-//            'award_received' => 0,
-//            'days_received' => 0
-//        ]);
-//    }
 }

@@ -42,6 +42,10 @@ Route::namespace('App\Http\Controllers')->group(function () {
         Route::get('/assetPaths', 'CabinetController@getSkinAndCapePaths');
     });
 
+    Route::prefix('privileges')->namespace('Privileges')->group(function () {
+       Route::get('/data', 'PrivilegesController@getPrivilegesData');
+    });
+
     /*
      * For now, payment system servers cannot send callbacks to my api because the server is running locally.
      * Temporarily, payment data will be received from a link to which payment systems redirect the user
