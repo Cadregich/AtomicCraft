@@ -46,11 +46,15 @@ export default {
     },
 
     async mounted() {
-        const server = this.$route.query.server;
+        let server = this.$route.query.server;
+        const selectedServer = 'Atomic Fragility';
         if (!server) {
-            this.$router.push({path: this.$route.path, query: {server: 'Atomic Fragility'}});
+            this.$router.push({path: this.$route.path, query: {server: selectedServer}});
+            this.server = selectedServer;
+        } else {
+            this.server = server;
         }
-        this.server = server;
+
         await this.getPrivilegesData();
     },
 
