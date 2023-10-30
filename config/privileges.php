@@ -9,7 +9,7 @@ return [
                 'kitAbsolute' => false,
                 'kitFood' => true,
                 'kitExp' => false,
-                'kitResources' => false,
+                'kitResources' => true,
                 'kitResources2' => false,
                 'privates' => 4,
                 'warps' => 2,

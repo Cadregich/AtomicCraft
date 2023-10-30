@@ -33,24 +33,26 @@ class PrivilegesController extends Controller
 
     private function configureTextCapabilities() {
         return [
-            'Восстановление голода' => 'eat',
-            'Полёт' => 'fly',
-            'Восстановление здоровья' => 'heal',
             'Варпы' => 'warps',
-            '/kit exp' => 'kitExp',
-            '/kit vip' => 'kitVip',
-            'Починка /repair' => 'repair',
-            '/kit food' => 'kitFood',
-            'Сохранение exp после смерти' => 'saveExp',
-            '/kit extra' => 'kitExtra',
             'Приваты' => 'privates',
-            'Эндер сундук /chest' => 'enderChest',
-            '/kit absolute' => 'kitAbsolute',
+
+            '/kit vip' => 'kitVip',
             '/kit resources' => 'kitResources',
+            '/kit food' => 'kitFood',
+            'Эндер сундук /chest' => 'enderChest',
             'Верстак /craft' => 'craftingBench',
-            '/kit resources2' => 'kitResources2',
+            'Сохранение exp после смерти' => 'saveExp',
+
+            '/kit extra' => 'kitExtra',
             'Сохранение инвентаря после смерти' => 'saveInventory',
             'Заход на переполненный сервер' => 'enterToFullServer',
+            '/kit exp' => 'kitExp',
+            'Восстановление голода' => 'eat',
+
+            '/kit absolute' => 'kitAbsolute',
+            'Полёт' => 'fly',
+            '/kit resources2' => 'kitResources2',
+            'Восстановление здоровья' => 'heal',
         ];
     }
 }
