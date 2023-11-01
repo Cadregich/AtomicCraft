@@ -81,18 +81,20 @@
             </div>
             <div class="d-flex mt-2 mb-1" style="font-size: 19px">
                 <label for="select_server">Cервер:</label>
-                <select  v-model="privilegesServer" @change="" style="margin-left: 10px"
-                         id="select_server" class="atomic-input" aria-label="Сервер"
-                         name="currency">
+                <select v-model="privilegesServer" @change="" style="margin-left: 10px"
+                        id="select_server" class="atomic-input" aria-label="Сервер"
+                        name="currency">
                     <option selected :value="privilegesServer">{{ privilegesServer }}</option>
                 </select>
             </div>
             <div class="privileges mt-2">
-                <template v-for="i in 6">
+                <template v-for="privilege in privileges">
                     <div class="privilege-tile column-center">
-                        <b>Vip</b>
-                        <div>100 <i class="fa-solid fa-coins"></i></div>
-                        <button class="atomic-butt1 mt-2">Купить</button>
+                        <b>{{ privilege.title }}</b>
+                        <div>{{ privilege.price }} <i class="fa-solid fa-coins"></i></div>
+                        <button class="atomic-butt1 mt-2" @click="buyPrivilege(privilege)">
+                            Купить
+                        </button>
                     </div>
                 </template>
             </div>
@@ -102,9 +104,9 @@
             <h4>Подарок за ежедневный вход</h4>
             <div class="d-flex">
                 <label for="select_server">Cервер:</label>
-                <select  v-model="dailyGiftServer" @change="" style="margin-left: 10px"
-                         id="select_server" class="atomic-input" aria-label="Сервер"
-                         name="currency">
+                <select v-model="dailyGiftServer" @change="" style="margin-left: 10px"
+                        id="select_server" class="atomic-input" aria-label="Сервер"
+                        name="currency">
                     <option selected value="Atomic Fragility">Atomic Fragility</option>
                 </select>
             </div>
@@ -116,7 +118,8 @@
             </form>
             <template v-if="dailyGiftData.nextGift">
                 <template v-if="dailyGiftData.status">
-                    <span class="mt-3">Вы получаете подарок <span class="text-info fst-italic">{{ dailyGiftData.days_received }}</span> суток подряд</span>
+                    <span class="mt-3">Вы получаете подарок <span
+                        class="text-info fst-italic">{{ dailyGiftData.days_received }}</span> суток подряд</span>
                     <span class="">
                 Сегодня вы можете получить <span class="text-info">{{ dailyGiftData.nextGift.title }} </span>
                 <span class="fst-italic"> х{{ dailyGiftData.nextGift.count }}</span>
@@ -147,15 +150,18 @@
             </div>
         </div>
     </div>
+    <buy-privilege-modal/>
 </template>
 
 <script>
 import SkinBlock from "./SkinBlock.vue";
 import PaymentBlock from "./PaymentBlock.vue";
+import BuyPrivilegeModal from "./BuyPrivilegeModal.vue";
 import {Notification} from "@/notifications.js";
 
 export default {
     components: {
+        BuyPrivilegeModal,
         PaymentBlock,
         SkinBlock
     },
@@ -168,6 +174,7 @@ export default {
                 capePath: '',
                 defaultSkinPath: '',
             },
+            privileges: {},
             dailyGiftData: {},
             privilegesServer: 'Atomic Fragility',
             dailyGiftServer: 'Atomic Fragility'
@@ -175,6 +182,7 @@ export default {
     },
     async created() {
         await this.getUserInfo();
+        await this.getPrivilegesData();
         this.getDailyGiftData();
     },
     methods: {
@@ -188,15 +196,34 @@ export default {
                     console.log(error);
                 });
         },
+
+        getPrivilegesData() {
+            axios.get('/privileges/data', {params: {server: this.privilegesServer}})
+                .then(res => {
+                    console.log(res.data);
+                    this.privileges = res.data;
+                })
+                .catch(error => {
+                    console.log(error);
+                });
+        },
+
+        buyPrivilege(privilege) {
+            this.$store.state.cabinet.buyPrivilegeData = {privilege: privilege, server: this.privilegesServer};
+            console.log(this.$store.state.cabinet.buyPrivilegeData);
+            this.$store.dispatch('openModal', 'buy-privileges-modal');
+        },
+
         getDailyGiftData() {
-            axios.get('/cabinet/daily-gift', { params: { server: this.dailyGiftServer }})
+            axios.get('/cabinet/daily-gift', {params: {server: this.dailyGiftServer}})
                 .then(res => {
                     console.log(res.data)
                     this.dailyGiftData = res.data;
                 })
         },
+
         checkDailyGift() {
-            axios.post('/cabinet/daily-gift', {  server: this.dailyGiftServer })
+            axios.post('/cabinet/daily-gift', {server: this.dailyGiftServer})
                 .then(res => {
                     Notification.error('Подарок успешно получен!')
                     console.log(res.data);

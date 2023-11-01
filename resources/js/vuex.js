@@ -1,5 +1,6 @@
 import Vuex from 'vuex';
 import shop from "./stores/shop.js";
+import cabinet from "./stores/cabinet.js";
 import modal from "./stores/modal.js"
 
 
@@ -44,6 +45,7 @@ const store = new Vuex.Store({
     },
     modules: {
         shop,
+        cabinet,
         modal
     }
 });

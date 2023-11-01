@@ -12,6 +12,7 @@ class Privilege extends Model
     protected $fillable = [
         'server_id',
         'title',
+        'price',
         'capabilities'
     ];
 

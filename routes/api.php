@@ -43,7 +43,9 @@ Route::namespace('App\Http\Controllers')->group(function () {
     });
 
     Route::prefix('privileges')->namespace('Privileges')->group(function () {
-       Route::get('/data', 'PrivilegesController@getPrivilegesData');
+        Route::get('/data', 'PrivilegesController@getPrivilegesData');
+        Route::get('/capabilities', 'PrivilegesController@getCapabilitiesData');
+        Route::post('/buy', 'PrivilegesController@buy')->middleware('auth:sanctum')->middleware('session.user');
     });
 
     /*
@@ -52,8 +54,8 @@ Route::namespace('App\Http\Controllers')->group(function () {
      * along with payment data. After uploading to the hosting, the system will be rebuilt
      */
 
-        Route::post('/callback/liqpay', 'PaymentCallbackController@Liqpay');
-        Route::post('/cabinet/liqpay', 'PaymentCallbackController@Liqpay');
+    Route::post('/callback/liqpay', 'PaymentCallbackController@Liqpay');
+    Route::post('/cabinet/liqpay', 'PaymentCallbackController@Liqpay');
 
 
     Route::prefix('shop')->namespace('Shop')->group(function () {

@@ -61,7 +61,7 @@ export default {
     methods: {
         async getPrivilegesData() {
             try {
-                const response = await axios.get('/privileges/data', {params: {server: this.server}});
+                const response = await axios.get('/privileges/capabilities', {params: {server: this.server}});
                 this.capabilities = response.data.capabilities;
                 this.privileges = response.data.privileges;
                 console.log(response.data);
