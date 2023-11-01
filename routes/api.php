@@ -40,10 +40,10 @@ Route::namespace('App\Http\Controllers')->group(function () {
         Route::get('/daily-gift', 'DailyGiftController@getDailyGiftData')->middleware('session.user');
         Route::post('/daily-gift', 'DailyGiftController@getDailyGift')->middleware('session.user');
         Route::get('/assetPaths', 'CabinetController@getSkinAndCapePaths');
+        Route::get('/privileges-data', 'CabinetController@getPrivilegesData');
     });
 
     Route::prefix('privileges')->namespace('Privileges')->group(function () {
-        Route::get('/data', 'PrivilegesController@getPrivilegesData');
         Route::get('/capabilities', 'PrivilegesController@getCapabilitiesData');
         Route::post('/buy', 'PrivilegesController@buy')->middleware('auth:sanctum')->middleware('session.user');
     });

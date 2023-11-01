@@ -3,23 +3,27 @@
 namespace App\Http\Controllers\Cabinet;
 
 use App\Http\Controllers\Controller;
+use App\Models\Privilege;
 use App\Services\Cabinet\UserDataService;
 use App\Services\Cabinet\PlayerAssetsService;
 use App\Services\Coins;
 use App\Services\Payment;
+use App\Services\PrivilegesService;
 use Illuminate\Http\Request;
 
 class CabinetController extends Controller
 {
-    protected $userDataService;
-    protected $paymentService;
-    protected $playerAssets;
+    protected UserDataService $userDataService;
+    protected Coins $paymentService;
+    protected PlayerAssetsService $playerAssets;
+    protected PrivilegesService $privilegesService;
 
-    public function __construct(PlayerAssetsService $playerAssetsService, UserDataService $userDataService, Coins $paymentService)
+    public function __construct(PlayerAssetsService $playerAssetsService, UserDataService $userDataService, Coins $paymentService, PrivilegesService $privilegesService)
     {
         $this->userDataService = $userDataService;
         $this->paymentService = $paymentService;
         $this->playerAssets = $playerAssetsService;
+        $this->privilegesService = $privilegesService;
     }
 
     public function __invoke(Request $request)
@@ -83,5 +87,11 @@ class CabinetController extends Controller
             $totalDonate += $this->paymentService->currencyToCoins($donate->amount, $donate->currency);
         }
         return $totalDonate;
+    }
+
+    public function getPrivilegesData(Request $request) {
+        $server = $request->input('server');
+        $serverId = $this->privilegesService->getServerIdByName($server);
+        return Privilege::select('title', 'price')->where('server_id', $serverId)->get();
     }
 }

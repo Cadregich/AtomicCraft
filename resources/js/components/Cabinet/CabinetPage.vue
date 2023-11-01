@@ -198,7 +198,7 @@ export default {
         },
 
         getPrivilegesData() {
-            axios.get('/privileges/data', {params: {server: this.privilegesServer}})
+            axios.get('/cabinet/privileges-data', {params: {server: this.privilegesServer}})
                 .then(res => {
                     console.log(res.data);
                     this.privileges = res.data;
