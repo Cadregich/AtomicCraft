@@ -21,7 +21,6 @@ class SetupPrivilegesCapabilities extends Command
     {
         if ($this->option('server') === 'AtomicFragility') {
             $privileges = config('privileges.AtomicFragility.privileges');
-
             Privilege::query()->delete();
 
             $serverId = Server::select('id')
@@ -29,10 +28,12 @@ class SetupPrivilegesCapabilities extends Command
                 ->first()['id'];
 
             foreach ($privileges as $privilegeName => $privilegeData) {
+                $encodedPrivilegesData = json_encode($privilegeData);
                 Privilege::create([
                     'server_id' => $serverId,
                     'title' => $privilegeName,
-                    'capabilities' => json_encode($privilegeData)
+                    'price' => $privilegeData['price'],
+                    'capabilities' => json_encode($privilegeData['capabilities'])
                 ]);
             }
             $this->info('Privilege settings setup successfully');
