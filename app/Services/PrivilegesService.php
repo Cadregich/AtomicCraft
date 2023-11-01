@@ -13,11 +13,13 @@ class PrivilegesService
         return Privilege::select('title', 'capabilities')->where('server_id', $serverId)->get();
     }
 
-    public function getServerIdByName($serverName) {
+    public function getServerIdByName($serverName)
+    {
         return Server::select('id')->where('server_name', $serverName)->value('id');
     }
 
-    public function getTableCapabilitiesData($capabilitiesText, $privilegesData) {
+    public function getTableCapabilitiesData($capabilitiesText, $privilegesData)
+    {
         $result = [];
 
         foreach ($capabilitiesText as $textRu => $textRuValue) {
@@ -32,14 +34,27 @@ class PrivilegesService
         return $result;
     }
 
-    public function getPrivilegeIdAndPrice($privilegeTitle, $serverId) {
+    public function getPrivilegeIdAndPrice($privilegeTitle, $serverId)
+    {
         return Privilege::select('id', 'price')->where('title', $privilegeTitle)
             ->where('server_id', $serverId)->first();
     }
 
-    public function buyPrivililege($userBalance, $userId, $privilegeData) {
+    public function getUserPrivilegeTitleAndPrice($userId) {
+        $privilegeId = User::select('privilege_id')->where('id', $userId)->value('privilege_id');
+        return Privilege::select('title', 'price')->where('id', $privilegeId)->first();
+    }
+
+    public function buyPrivililege($userBalance, $userId, $privilegeData, $userPrivilegeData)
+    {
         if ($userBalance < $privilegeData->price) {
-            throw new \Exception('Недостаточно монет для покупки привилегии ' . $privilegeData->title);
+            throw new \Exception('Недостаточно монет для покупки привилегии ' . $privilegeData->title, 402);
+        } elseif ($userPrivilegeData->price >= $privilegeData->price) {
+            if ($userPrivilegeData->title === $privilegeData->title) {
+                throw new \Exception('У вас уже есть привилегия ' . $userPrivilegeData->title, 409);
+            } else {
+                throw new \Exception('У вас уже есть привилегия лучше этой', 409);
+            }
         } else {
             $newBalance = $userBalance - $privilegeData->price;
             User::where('id', $userId)->update([

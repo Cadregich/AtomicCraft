@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Privileges;
 
 use App\Http\Controllers\Controller;
+use App\Models\Privilege;
 use App\Services\PrivilegesService;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -40,11 +41,13 @@ class PrivilegesController extends Controller
         $privilegeActualData = $this->privilegesService->getPrivilegeIdAndPrice($privilege['title'], $serverId);
         $privilegeActualData['title'] = $privilege['title'];
 
+        $userPrivilegeData = $this->privilegesService->getUserPrivilegeTitleAndPrice($userId);
+
         try {
-            $this->privilegesService->buyPrivililege($userBalance, $userId, $privilegeActualData);
+            $this->privilegesService->buyPrivililege($userBalance, $userId, $privilegeActualData, $userPrivilegeData);
             return response()->json(['message' => 'Привилегия ' . $privilege['title'] . ' успешно куплена.'], 200);
         } catch (\Exception $exception) {
-            return response()->json(['error' => $exception->getMessage()], 402);
+            return response()->json(['error' => $exception->getMessage()], $exception->getCode());
         }
     }
 
