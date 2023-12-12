@@ -1,46 +1,49 @@
 <template>
     <div class="skin-block">
-        <!-- Change skin block -->
-        <div class="skin-butt atomic-block column-center row-gap-2" id="skin-butt-skin">
-            <div class="skin-butt-title nobr">Изменить скин</div>
-            <template v-if="skinPath">
-                <skin-head ref="skinHead" size="50" type="skin" :texture-path="skinPath"></skin-head>
-            </template>
-            <div class="upload-and-remove-skin column-center">
-                <label for="skin-upload" class="change-skin-butt nobr">
-                    <i class="fa-sharp fa-solid fa-share"></i> Загрузить
-                    <input @change="uploadSkin($event, 'skin')" ref="skinUpload" id="skin-upload" class="d-none"
-                           type="file"
-                           name="file" accept="png">
-                </label>
-                <button @click="removeSkin('skin')" type="submit" class="remove-skin-butt" id="removeSkin"
-                        title="Удалить скин"
-                        value="">
-                    <i class="fa-solid fa-trash-can"></i> Удалить
-                </button>
+        <div id="user-name">{{ userName }} <i class="fa-solid fa-pen-to-square"></i></div>
+        <div class="skin-block-blocks d-flex align-items-start">
+            <!-- Change skin block -->
+            <div class="skin-butt atomic-block column-center row-gap-2" id="skin-butt-skin">
+                <div class="skin-butt-title nobr">Изменить скин</div>
+                <template v-if="skinPath">
+                    <skin-head ref="skinHead" size="50" type="skin" :texture-path="skinPath"></skin-head>
+                </template>
+                <div class="upload-and-remove-skin column-center">
+                    <label for="skin-upload" class="change-skin-butt nobr">
+                        <i class="fa-sharp fa-solid fa-share"></i> Загрузить
+                        <input @change="uploadSkin($event, 'skin')" ref="skinUpload" id="skin-upload" class="d-none"
+                               type="file"
+                               name="file" accept="png">
+                    </label>
+                    <button @click="removeSkin('skin')" type="submit" class="remove-skin-butt" id="removeSkin"
+                            title="Удалить скин"
+                            value="">
+                        <i class="fa-solid fa-trash-can"></i> Удалить
+                    </button>
+                </div>
             </div>
-        </div>
-        <!-- Skin viewer block -->
-        <template v-if="skinPath">
-            <skinViewer ref="skinViewerRef" :skin-path="skinPath" :cape-path="capePath"></skinViewer>
-        </template>
-        <!-- Change cape block -->
-        <div class="skin-butt atomic-block column-center row-gap-2" id="skin-butt-cape">
-            <div class="skin-butt-title nobr">Изменить плащ</div>
-            <template v-if="capePath">
-                <skin-head ref="skinCape" size="50" type="cape" :texture-path="capePath"></skin-head>
+            <!-- Skin viewer block -->
+            <template v-if="skinPath">
+                <skinViewer ref="skinViewerRef" :skin-path="skinPath" :cape-path="capePath"></skinViewer>
             </template>
-            <div class="upload-and-remove-skin column-center" id="cape-url">
-                <label for="cape-upload" class="change-skin-butt nobr">
+            <!-- Change cape block -->
+            <div class="skin-butt atomic-block column-center row-gap-2" id="skin-butt-cape">
+                <div class="skin-butt-title nobr">Изменить плащ</div>
+                <template v-if="capePath">
+                    <skin-head ref="skinCape" size="50" type="cape" :texture-path="capePath"></skin-head>
+                </template>
+                <div class="upload-and-remove-skin column-center" id="cape-url">
+                    <label for="cape-upload" class="change-skin-butt nobr">
                         <i class="fa-sharp fa-solid fa-share"></i> Загрузить
                         <input @change="uploadSkin($event, 'cape')" ref="capeUpload" id="cape-upload" class="d-none"
                                type="file"
                                name="file" accept="png">
-                </label>
-                <button @click="removeSkin('cape')" type="submit" class="remove-skin-butt" id="removeCape"
-                        title="Удалить скин">
-                    <i class="fa-solid fa-trash-can"></i> Удалить
-                </button>
+                    </label>
+                    <button @click="removeSkin('cape')" type="submit" class="remove-skin-butt" id="removeCape"
+                            title="Удалить скин">
+                        <i class="fa-solid fa-trash-can"></i> Удалить
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -65,6 +68,11 @@ export default {
             uploadErrorInfo: {
                 validSkinSizes: ''
             }
+        }
+    },
+    computed: {
+        userName() {
+            return this.$store.state.userName;
         }
     },
     mounted() {
@@ -167,7 +175,7 @@ export default {
 <style scoped>
 .skin-block {
     display: flex;
-    align-items: start;
+    flex-direction: column;
     background-color: rgba(0, 0, 0, 0.05);
     padding: 15px;
     border-radius: 20px;
@@ -221,5 +229,17 @@ export default {
 
 .remove-skin-butt:active {
     background: #3904e3;
+}
+#user-name {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    font-size: 20px;
+    margin-bottom: 10px;
+}
+.fa-pen-to-square {
+    position: relative;
+    top: 2px;
+    left: 5px;
 }
 </style>

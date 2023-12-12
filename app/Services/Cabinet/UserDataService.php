@@ -10,7 +10,7 @@ class UserDataService
 {
     public function getUserData($userId) {
         return User::where('id', $userId)
-            ->select('name', 'privilege_id', 'last_game_login', 'email', 'created_at')->first();
+            ->select('name', 'balance', 'privilege_id', 'last_game_login', 'email', 'created_at')->first();
     }
 
     public function getPrivilegeTitle($userData) {

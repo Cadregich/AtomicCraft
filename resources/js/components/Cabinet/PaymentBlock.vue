@@ -1,17 +1,24 @@
 <template>
     <div class="balance-block atomic-block column-center">
-        <h4><i class="cabinet-block-title-icon fa-solid fa-money-check-dollar"></i>Баланс</h4>
-        <div class="deposit-bonus d-flex column-gap-3">
-            <i>От:</i>
-            <div>100 <i class="fa-solid fa-coins"></i> + 5%</div>
-            <div>200 <i class="fa-solid fa-coins"></i> + 10%</div>
-            <div>500 <i class="fa-solid fa-coins"></i> + 30%</div>
+        <h4>
+            <i class="cabinet-block-title-icon fa-solid fa-money-check-dollar"></i>
+            Баланс: {{ balance }} <i class="fa-solid fa-coins"></i>
+        </h4>
+        <div class="deposit-bonus">
+            <i id="deposit-bonus-label">Бонус при пополнении от:</i> <br>
+            <div class="d-flex">
+                <div class="atomic-block atomic-bg-dark">100 <i class="fa-solid fa-coins"></i> + 5%</div>
+                <div class="atomic-block atomic-bg-dark" style="margin-left: 5px; margin-right: 5px">
+                    200 <i class="fa-solid fa-coins"></i> + 10%
+                </div>
+                <div class="atomic-block atomic-bg-dark">500 <i class="fa-solid fa-coins"></i> + 30%</div>
+            </div>
         </div>
-        <div class="container mt-3">
+        <div class="mt-3">
             <form class="w-100 d-flex flex-column align-items-center" id="depositForm"
                   @submit.prevent="depositSubmit">
-                <label for="deposit-input">Введите сумму для пополнения баланса</label>
-                <div class="d-flex mt-1">
+                <label for="deposit-input">На какую сумму вы хотите пополнить баланс</label>
+                <div class="d-flex mt-1 w-100">
                     <input v-model="depositValue" @input="handleDepositValue" id="deposit-input"
                            class="atomic-input" type="number" placeholder="" name="value">
                     <select v-model="depositSelectedCurrency" @change="getCommonCurrencyMultiplier()"
@@ -22,9 +29,10 @@
                         <option value="USD">&#36; USD</option>
                     </select>
                 </div>
+                <button class="text-white mt-3" id="deposit-btn" type="submit">Пополнить</button>
+
             </form>
         </div>
-        <button class="atomic-butt1 mt-3" type="submit" form="depositForm">Пополнить</button>
         <div class="deposit-final-sum mt-2" v-if="depositValue">
             Вам начислиться: <span class="nobr"><span style="font-size: 18px">{{ formattedTotalCoins }} </span> <i
             class="fa-solid fa-coins"></i></span>
@@ -37,6 +45,7 @@ import numeral from "numeral";
 
 export default {
     name: "PaymentBlock",
+    props: ['balance'],
     data() {
         return {
             depositValue: '',
@@ -68,7 +77,9 @@ export default {
             this.calculateTotalCoins();
         },
         depositSubmit() {
-            this.makePayment(this.depositValue, this.depositSelectedCurrency);
+            if (this.totalCoins > 0) {
+                this.makePayment(this.depositValue, this.depositSelectedCurrency);
+            }
         },
         calculateTotalCoins() {
             this.totalCoins = (this.depositValue * this.currencyMultiplier).toFixed(2);
@@ -85,5 +96,43 @@ export default {
 </script>
 
 <style scoped>
+#deposit-bonus-label, label[for="deposit-input"] {
+    font-size: 17px;
+}
 
+.balance-block {
+    width: 430px;
+}
+
+#deposit-input {
+    border-radius: 10px 0 0 10px;
+    font-size: 20px;
+    width: 100%;
+}
+
+#deposit-select-currency {
+    border-radius: 0 10px 10px 0;
+}
+
+#deposit-btn {
+    width: 100%;
+    height: 38px;
+    font-size: 18px;
+    border: none;
+    border-radius: 10px;
+    background-color: #5618db;
+}
+
+#deposit-btn:hover {
+    background-color: #6129e0;
+    transition: 0.3s;
+}
+
+.deposit-bonus {
+    font-size: 15px;
+}
+
+.deposit-final-sum {
+    font-size: 17px;
+}
 </style>

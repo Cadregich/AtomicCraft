@@ -4,38 +4,30 @@ namespace App\Http\Controllers\Privileges;
 
 use App\Http\Controllers\Controller;
 use App\Models\Privilege;
-use App\Models\Server;
+use App\Services\PrivilegesService;
 use App\Models\User;
 use Illuminate\Http\Request;
 
 class PrivilegesController extends Controller
 {
-    public function getCapabilitiesData(Request $request) {
-        $server = $request->input('server');
-        $serverId = $this->getServerIdByName($server);
-        $privilegesData = Privilege::select('title', 'capabilities')->where('server_id', $serverId)->get();
+    protected PrivilegesService $privilegesService;
 
-        $result = [];
-        $capabilitiesText = $this->configureTextCapabilities();
-
-        foreach ($capabilitiesText as $textRu => $textRuValue) {
-            $privilegesCapabilities = [];
-            foreach ($privilegesData as $privilege) {
-                $capabilities = json_decode($privilege['capabilities'], true);
-                $privilegesCapabilities[$privilege['title']] = $capabilities[$textRuValue];
-            }
-            $result[$textRu] = $privilegesCapabilities;
-        }
-
-        $privilegesTitles = $privilegesData->pluck('title')->all();
-
-        return ['capabilities' => $result, 'privileges' => $privilegesTitles];
+    public function __construct(PrivilegesService $privilegesService)
+    {
+        $this->privilegesService = $privilegesService;
     }
 
-    public function getPrivilegesData(Request $request) {
+    public function getCapabilitiesData(Request $request)
+    {
         $server = $request->input('server');
-        $serverId = $this->getServerIdByName($server);
-        return Privilege::select('title', 'price')->where('server_id', $serverId)->get();
+        $serverId = $this->privilegesService->getServerIdByName($server);
+        $privilegesData = $this->privilegesService->getPrivilegesCapabilitiesAndTitles($serverId);
+        $capabilitiesText = $this->configureTextCapabilities();
+
+        $tableCapabilitiesData = $this->privilegesService->getTableCapabilitiesData($capabilitiesText, $privilegesData);
+        $privilegesTitles = $privilegesData->pluck('title')->all();
+
+        return ['capabilities' => $tableCapabilitiesData, 'privileges' => $privilegesTitles];
     }
 
     public function buy(Request $request)
@@ -44,28 +36,23 @@ class PrivilegesController extends Controller
         $privilege = $request->input('privilege');
         $userId = session('user')['id'];
         $userBalance = User::select('balance')->where('id', $userId)->value('balance');
-        $serverId = Server::select('id')->where('server_name', $server)->value('id');
-        $privilegeActualData = Privilege::select('id', 'price')->where('title', $privilege['title'])
-            ->where('server_id', $serverId)->first();
+        $serverId = $this->privilegesService->getServerIdByName($server);
 
-        if ($userBalance < $privilegeActualData->price) {
-            return response()->json(['error' => 'Недостаточно монет для покупки привилегии ' . $privilege['title']], 402);
-        } else {
-            $newBalance = $userBalance - $privilegeActualData->price;
-            User::where('id', $userId)->update([
-                'balance' => $newBalance,
-                'privilege_id' => $privilegeActualData->id
-            ]);
+        $privilegeActualData = $this->privilegesService->getPrivilegeIdAndPrice($privilege['title'], $serverId);
+        $privilegeActualData['title'] = $privilege['title'];
 
+        $userPrivilegeData = $this->privilegesService->getUserPrivilegeTitleAndPrice($userId);
+
+        try {
+            $this->privilegesService->buyPrivililege($userBalance, $userId, $privilegeActualData, $userPrivilegeData);
             return response()->json(['message' => 'Привилегия ' . $privilege['title'] . ' успешно куплена.'], 200);
+        } catch (\Exception $exception) {
+            return response()->json(['error' => $exception->getMessage()], $exception->getCode());
         }
     }
 
-    private function getServerIdByName($serverName) {
-        return Server::select('id')->where('server_name', $serverName)->first()['id'];
-    }
-
-    private function configureTextCapabilities() {
+    private function configureTextCapabilities()
+    {
         return [
             'Варпы' => 'warps',
             'Приваты' => 'privates',

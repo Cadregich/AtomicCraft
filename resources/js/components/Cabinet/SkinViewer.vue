@@ -73,7 +73,6 @@ export default {
 <style scoped>
 .skin {
     grid-area: top;
-    margin-bottom: 40px;
 }
 
 .skin-animation-buttons {

@@ -2,15 +2,16 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Kit;
 use App\Models\Privilege;
 use App\Models\Server;
 use Illuminate\Console\Command;
 
-class SetupPrivilegesCapabilities extends Command
+class SetupKits extends Command
 {
-    protected $signature = 'setup:privileges {--server=}';
+    protected $signature = 'setup:kits {--server=}';
 
-    protected $description = 'Set privilege capabilities to DB';
+    protected $description = 'Setup kits to DB';
 
     public function __construct()
     {
@@ -20,22 +21,20 @@ class SetupPrivilegesCapabilities extends Command
     public function handle()
     {
         if ($this->option('server') === 'AtomicFragility') {
-            $privileges = config('privileges.AtomicFragility');
-            Privilege::query()->delete();
+            $kits = config('kits.AtomicFragility');
+            Kit::query()->delete();
 
             $serverId = Server::select('id')
                 ->whereRaw("REPLACE(server_name, ' ', '') = ?", [$this->option('server')])
                 ->first()['id'];
 
-            foreach ($privileges as $privilegeName => $privilegeData) {
-                Privilege::create([
+            foreach ($kits as $kit => $kitData) {
+                Kit::create([
                     'server_id' => $serverId,
-                    'title' => $privilegeName,
-                    'price' => $privilegeData['price'],
-                    'capabilities' => json_encode($privilegeData['capabilities'])
+                    'command' => $kit,
+                    'data' => json_encode($kitData)
                 ]);
             }
-
             $this->info('Privilege settings setup successfully');
         }
     }
