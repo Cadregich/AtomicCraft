@@ -69,7 +69,7 @@
 
         <SkinBlock></SkinBlock>
 
-        <PaymentBlock></PaymentBlock>
+        <PaymentBlock :balance="userInfo.userBalance"></PaymentBlock>
 
         <div class="privileges-block atomic-block column-center">
             <h4><i class="cabinet-block-title-icon fa-solid fa-shopping-basket"></i>Привилегии</h4>
@@ -273,28 +273,8 @@ export default {
     cursor: pointer;
 }
 
-.balance-block {
-    width: 430px;
-}
-
-#deposit-input {
-    border-radius: 5px 0 0 5px;
-}
-
-#deposit-select-currency {
-    border-radius: 0 5px 5px 0;
-}
-
 #deposit-select-currency > option {
     color: black;
-}
-
-.deposit-bonus {
-    font-size: 15px;
-}
-
-.deposit-final-sum {
-    font-size: 17px;
 }
 
 .privilege-tile {

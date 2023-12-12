@@ -95,6 +95,10 @@ body {
     font-size: 16px !important;
 }
 
+.atomic-bg-dark {
+    background-color: rgb(27, 1, 45, 0.45) !important;
+}
+
 .atomic-butt1 {
     border: none;
     border-radius: 5px;

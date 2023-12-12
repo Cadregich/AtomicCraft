@@ -56,9 +56,10 @@ class CabinetController extends Controller
         $lastGameLoginDate = $this->userDataService->getLastGameLoginDate($userData);
         $registrationDate = $userData->created_at->format('d.m.Y');
         $capabilitiesFromTotalDonate = $this->getCapabilitiesFromAllDonates($userId);
+        $userBalance= $userData->balance;
         $userName = $userData->name;
         $userEmail = $this->userDataService->maskEmail($userData->email);
-        return compact('userName', 'userEmail', 'privilegeTitle', 'lastGameLoginDate', 'capabilitiesFromTotalDonate', 'registrationDate');
+        return compact('userName', 'userEmail', 'userBalance', 'privilegeTitle', 'lastGameLoginDate', 'capabilitiesFromTotalDonate', 'registrationDate');
     }
 
     /**
