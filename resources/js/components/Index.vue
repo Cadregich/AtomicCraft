@@ -1,7 +1,7 @@
 <template>
     <div>
         <navbar/>
-        <template v-if="typeof userNickname === 'string' && userNickname">
+        <template v-if="(typeof userNickname === 'string' && userNickname) || (isQueryComplete)">
             <router-view></router-view>
         </template>
     </div>
@@ -15,19 +15,20 @@ export default {
     components: {
         Navbar
     },
-    computed: {
-        userNickname() {
-            return this.$store.state.userName;
+    data() {
+        return {
+            isQueryComplete: false,
         }
     },
     mounted() {
         axios.get('/user/name')
             .then(res => {
-                this.$store.commit('setUserName', res.data);
+                this.$store.commit('setUserName', res.data)
             })
             .catch(error => {
                 console.log(error);
             });
+        this.isQueryComplete = true;
     },
     async created() {
         if (await this.$store.dispatch('getCookie', 'ait')) {
