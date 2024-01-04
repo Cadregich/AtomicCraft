@@ -70,7 +70,11 @@ class CabinetController extends Controller
     public function getCommonCurrencyMultiplier(Request $request)
     {
         $currency = $request->input('currency');
-        return $this->paymentService->currencyToCoins(1, $currency);
+        return $this->paymentService->ratesRelationCoins[$currency];
+    }
+
+    public function getDepositBonusesValue() {
+        return config('bonuses.deposit');
     }
 
     private function getCapabilitiesFromAllDonates($userId): array
@@ -88,6 +92,13 @@ class CabinetController extends Controller
             $totalDonate += $this->paymentService->currencyToCoins($donate->amount, $donate->currency);
         }
         return $totalDonate;
+    }
+
+    public function getCurrencyValueByCoins(Request $request)
+    {
+        $coins = $request->input('amountCoins');
+        $currency = $request->input('currency');
+        return $this->paymentService->coinsToCurrency($coins, $currency);
     }
 
     public function getPrivilegesData(Request $request) {

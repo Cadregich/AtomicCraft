@@ -37,6 +37,8 @@ Route::namespace('App\Http\Controllers')->group(function () {
         Route::post('/skin', 'PlayerAssetsController@upload');
         Route::delete('/skin', 'PlayerAssetsController@reset');
         Route::get('/common-currency-multiplier', 'CabinetController@getCommonCurrencyMultiplier');
+        Route::get('/deposit-bonuses', 'CabinetController@getDepositBonusesValue');
+        Route::get('/currency-to-coins', 'CabinetController@getCurrencyValueByCoins');
         Route::get('/daily-gift', 'DailyGiftController@getDailyGiftData')->middleware('session.user');
         Route::post('/daily-gift', 'DailyGiftController@getDailyGift')->middleware('session.user');
         Route::get('/assetPaths', 'CabinetController@getSkinAndCapePaths');
