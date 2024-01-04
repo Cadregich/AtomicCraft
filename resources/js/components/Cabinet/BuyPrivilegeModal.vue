@@ -22,7 +22,7 @@
 </template>
 
 <script>
-import ModalLayout from '../ModalLayout.vue'
+import ModalLayout from '../Modals/ModalLayout.vue'
 
 export default {
     name: 'BuyPrivilegeModal',

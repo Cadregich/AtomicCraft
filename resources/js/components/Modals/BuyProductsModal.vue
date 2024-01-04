@@ -34,7 +34,7 @@
 </template>
 
 <script>
-import ModalLayout from '../ModalLayout.vue'
+import ModalLayout from './ModalLayout.vue'
 import ThanksModal from './ThanksModal.vue'
 
 export default {
