@@ -1,17 +1,22 @@
 <template>
     <div class="balance-block atomic-block column-center">
         <h4>
-            <i class="cabinet-block-title-icon fa-solid fa-money-check-dollar"></i>
-            Баланс: {{ balance }} <i class="fa-solid fa-coins"></i>
+            Ваш баланс: {{ balance }} <i class="fa-solid fa-coins"></i>
         </h4>
+        <div id="block-title-separator"></div>
         <div class="deposit-bonus">
             <i id="deposit-bonus-label">Бонус при пополнении от:</i> <br>
             <div class="d-flex">
-                <div class="atomic-block atomic-bg-dark">100 <i class="fa-solid fa-coins"></i> + 5%</div>
-                <div class="atomic-block atomic-bg-dark" style="margin-left: 5px; margin-right: 5px">
+                <button class="atomic-block atomic-bg-dark" @click="setDepositValue(100)">
+                    100 <i class="fa-solid fa-coins"></i> + 5%
+                </button>
+                <button class="atomic-block atomic-bg-dark" @click="setDepositValue(200)"
+                        style="margin-left: 5px; margin-right: 5px">
                     200 <i class="fa-solid fa-coins"></i> + 10%
-                </div>
-                <div class="atomic-block atomic-bg-dark">500 <i class="fa-solid fa-coins"></i> + 30%</div>
+                </button>
+                <button class="atomic-block atomic-bg-dark" @click="setDepositValue(500)">
+                    500 <i class="fa-solid fa-coins"></i> + 30%
+                </button>
             </div>
         </div>
         <div class="mt-3">
@@ -30,12 +35,13 @@
                     </select>
                 </div>
                 <button class="text-white mt-3" id="deposit-btn" type="submit">Пополнить</button>
-
             </form>
         </div>
         <div class="deposit-final-sum mt-2" v-if="depositValue">
             Вам начислиться: <span class="nobr"><span style="font-size: 18px">{{ formattedTotalCoins }} </span> <i
-            class="fa-solid fa-coins"></i></span>
+            class="fa-solid fa-coins"></i>
+        <template v-if="bonusValue"> Бонус: {{formattedBonusValue}} <i
+            class="fa-solid fa-coins"></i></template></span>
         </div>
     </div>
 </template>
@@ -52,16 +58,26 @@ export default {
             depositSelectedCurrency: 'UAH',
             currencyMultiplier: 0,
             totalCoins: 0,
+            depositBonuses: {},
+            bonusValue: 0,
         }
     },
+
     computed: {
         formattedTotalCoins() {
-            return numeral(this.totalCoins).format('0,0.00');
+            return numeral(this.totalCoins).format('0,0');
+        },
+
+        formattedBonusValue() {
+            return numeral(this.bonusValue).format('0,0');
         }
     },
+
     mounted() {
-        this.getCommonCurrencyMultiplier()
+        this.getCommonCurrencyMultiplier();
+        this.getDepositBonuses();
     },
+
     methods: {
         getCommonCurrencyMultiplier() {
             return axios.get('/cabinet/common-currency-multiplier', {params: {currency: this.depositSelectedCurrency}})
@@ -70,27 +86,67 @@ export default {
                     this.calculateTotalCoins();
                 });
         },
+        getDepositBonuses() {
+            return axios.get('/cabinet/deposit-bonuses')
+                .then(res => {
+                    console.log(res.data);
+                    this.depositBonuses = res.data;
+                })
+        },
         handleDepositValue() {
             if (this.depositValue < 0) {
                 this.depositValue = 0;
             }
             this.calculateTotalCoins();
         },
+
         depositSubmit() {
             if (this.totalCoins > 0) {
                 this.makePayment(this.depositValue, this.depositSelectedCurrency);
             }
         },
+
         calculateTotalCoins() {
             this.totalCoins = (this.depositValue * this.currencyMultiplier).toFixed(2);
+            let bonusFactor = 1;
+
+            for (let key in this.depositBonuses) {
+                if (this.totalCoins >= parseInt(key)) {
+                    bonusFactor = 1 + (parseInt(this.depositBonuses[key]) / 100);
+                }
+            }
+            this.bonusValue = this.totalCoins * bonusFactor - this.totalCoins;
         },
+
+
         makePayment(amount, currency) {
             axios.post('/cabinet/pay', {amount: amount, currency: currency})
                 .then(res => {
                     console.log(res.data);
                     location.href = res.data.url + '?data=' + res.data.data + '&signature=' + res.data.signature;
                 });
+        },
+
+        async setDepositValue(value) {
+            try {
+                this.depositValue = await this.getCurrencyValueByCoins(value, this.depositSelectedCurrency);
+                this.handleDepositValue();
+            } catch (error) {
+                console.error(error);
+            }
+        },
+
+        async getCurrencyValueByCoins(amountCoins, currency) {
+            try {
+                const response = await axios.get('/cabinet/currency-to-coins', {
+                    params: { amountCoins: amountCoins, currency: currency }
+                });
+                return response.data;
+            } catch (error) {
+                throw error;
+            }
         }
+
     }
 }
 </script>
@@ -106,12 +162,16 @@ export default {
 
 #deposit-input {
     border-radius: 10px 0 0 10px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(67, 2, 153, 0.4);
     font-size: 20px;
     width: 100%;
 }
 
 #deposit-select-currency {
     border-radius: 0 10px 10px 0;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(67, 2, 153, 0.4);
 }
 
 #deposit-btn {

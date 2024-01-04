@@ -10,8 +10,8 @@ use InvalidArgumentException;
 class Coins
 {
     private $ratesRelationUAH;
-    private $ratesRelationCoins = [];
-    private $factor = 2.4;
+    public $ratesRelationCoins = [];
+    private $factor = 2.5;
     private $availableCurrencies = ['RUB', 'USD', 'UAH'];
 
     /**
@@ -45,7 +45,7 @@ class Coins
 
         foreach ($this->ratesRelationCoins as $coin => $rate) {
             if ($currency === $coin) {
-                return $count * $rate;
+                return round($count * $rate);
             }
         }
 
